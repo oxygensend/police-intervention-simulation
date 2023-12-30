@@ -47,7 +47,6 @@ public class SimulationConfig {
                     new Point(99, 99),
                     new Point(99, 50)
             )
-
     );
 
 

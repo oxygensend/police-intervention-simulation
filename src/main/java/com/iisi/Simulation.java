@@ -2,6 +2,7 @@ package com.iisi;
 
 import com.iisi.agents.District;
 import com.iisi.agents.PolicePatrol;
+import com.iisi.utils.ArrayUtils;
 import com.iisi.utils.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,18 +21,42 @@ public class Simulation {
 
     }
 
+
+    private int[] calculateInitialPatrolPerDistrict() {
+
+        int[] patrolPerDistrict = new int[SimulationConfig.DISTRICTS_CONFIG.size()];
+
+        int sum;
+        int j = 0;
+        while (true) {
+            sum = ArrayUtils.sumArray(patrolPerDistrict);
+            if (sum == SimulationConfig.NUMBER_OF_PATROLS) {
+                break;
+            }
+            patrolPerDistrict[j]++;
+            j++;
+
+            if (j == patrolPerDistrict.length) {
+                j = 0;
+            }
+        }
+
+        return patrolPerDistrict;
+
+    }
+
     private void setUpPatrols() {
         int index = 1;
-//        var d =  generateRandomDistricts();
+        int[] patrolPerDistrict = calculateInitialPatrolPerDistrict();
+
 
         for (var districtSet : SimulationConfig.DISTRICTS_CONFIG.entrySet()) {
             var district = new District(index, districtSet.getKey(), districtSet.getValue(),
                                         District.ThreatLevel.from(SimulationConfig.BASE_THREAT_LEVEL),
-                                        4);
+                                        patrolPerDistrict[index - 1]);
 
             LOGGER.info("District {} created with threatLevel {}", district.name, district.getThreatLevel());
             City.instance().addDistrict(district);
-
 
             positionsTaken = new ArrayList<>();
             for (int i = 0; i < district.initialNumberOfPatrols; i++) {
