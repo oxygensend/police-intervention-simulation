@@ -1,17 +1,11 @@
 package com.iisi;
 
-import com.iisi.agents.District;
-import com.iisi.agents.Headquarters;
-import com.iisi.agents.Incident;
-import com.iisi.agents.PolicePatrol;
+import com.iisi.agents.*;
 import com.iisi.utils.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 
 public class Simulation {
@@ -26,10 +20,16 @@ public class Simulation {
             updatePatrolsState();
             updateIncidentsState();
             generateNewIncidents();
+            removeInActiveAgents();
 
+            CITY.incrementSimulationDuration();
             LOGGER.info("Sleeping for 5 seconds");
-            Thread.sleep(5000);
+            Thread.sleep(1000);
         }
+    }
+
+    private void removeInActiveAgents() {
+        CITY.agentList.removeIf(agent -> !agent.isActive());
     }
 
     private void assignTasks() {
@@ -45,7 +45,13 @@ public class Simulation {
             if (police instanceof PolicePatrol) {
                 var previousPosition = police.getPosition();
                 ((PolicePatrol) police).step();
-                LOGGER.info("Patrol {} moved from {} to {} | assigned task {}", police.id, previousPosition, police.getPosition(), ((PolicePatrol) police).getState());
+                if (!previousPosition.equals(police.getPosition())) {
+                    LOGGER.info("Patrol {} moved from {} to {} | assigned task {}", police.id, previousPosition, police.getPosition(), ((PolicePatrol) police).getState());
+                } else if (((PolicePatrol) police).getState() == PolicePatrol.State.INTERVENTION) {
+                    LOGGER.info("Patrol {} is in intervention", police.id);
+                } else if (((PolicePatrol) police).getState() == PolicePatrol.State.FIRING) {
+                    LOGGER.info("Patrol {} is in firing", police.id);
+                }
             }
         }
     }

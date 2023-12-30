@@ -23,24 +23,24 @@ public class Headquarters extends Agent {
     public void assignTasks() {
         var allEntities = City.instance().agentList;
         patrols = allEntities.stream()
-                .filter(x -> x instanceof PolicePatrol)
-                .map(x -> (PolicePatrol) x)
-                .collect(Collectors.toList());
+                             .filter(x -> x instanceof PolicePatrol && x.isActive())
+                             .map(x -> (PolicePatrol) x)
+                             .collect(Collectors.toList());
         incidents = allEntities.stream()
-                .filter(x -> x instanceof Incident)
-                .map(x -> (Incident) x)
-                .collect(Collectors.toList());
+                               .filter(x -> x instanceof Incident && x.isActive())
+                               .map(x -> (Incident) x)
+                               .collect(Collectors.toList());
 
         for (Incident incident : incidents) {
-            if ((incident).getPatrolsReaching() == null && (incident).getPatrolsSolving() == null) {
+            if ((incident).getPatrolsReaching().isEmpty() && (incident).getPatrolsSolving().isEmpty()) {
                 PolicePatrol availablePatrol;
-                    availablePatrol = City.instance().findNearestAvailablePolicePatrol(incident);
-                    if (availablePatrol != null) {
-                        availablePatrol.takeTask();
-                        incident.setPatrolsReaching(availablePatrol);
-                        LOGGER.info("Patrol {} is going to incident at {}", availablePatrol.id, incident.position);
-                        break;
-                    }
+                availablePatrol = City.instance().findNearestAvailablePolicePatrol(incident);
+                if (availablePatrol != null) {
+                    availablePatrol.takeTask(incident);
+                    incident.setPatrolsReaching(availablePatrol);
+                    LOGGER.info("Patrol {} is going to incident at {}", availablePatrol.id, incident.position);
+                    break;
+                }
             }
         }
     }

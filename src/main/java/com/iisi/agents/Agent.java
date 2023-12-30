@@ -8,6 +8,7 @@ public abstract class Agent {
     public final UUID id = UUID.randomUUID();
     public final District district;
     protected Point position;
+    protected boolean isActive = true;
 
     protected Agent(Point position, District district) {
         this.position = position;
@@ -26,5 +27,8 @@ public abstract class Agent {
         district.removeTakenPosition(position);
     }
 
+    public boolean isActive() {
+        return isActive;
+    }
 
 }

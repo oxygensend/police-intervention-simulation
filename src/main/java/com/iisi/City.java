@@ -6,10 +6,7 @@ import com.iisi.agents.Incident;
 import com.iisi.agents.PolicePatrol;
 import com.iisi.utils.Point;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class City {
 
@@ -18,8 +15,8 @@ public class City {
     public final int[][] grid;
     public final List<Agent> agentList;
     public final List<District> districtList;
-
     private int neutralizedPatrolsTotal = 0;
+    private int simulationDuration = 0;
 
     private City() {
         agentList = new ArrayList<>();
@@ -64,8 +61,9 @@ public class City {
         agentList.add(entity);
     }
 
-    public void removeAgent(Agent entity) {
-        agentList.remove(entity);
+    public void removeAgent(Agent agent) {
+        agent.clear();
+        agentList.remove(agent);
     }
 
     public Point getRandomPosition() {
@@ -77,14 +75,31 @@ public class City {
 
     public PolicePatrol findNearestAvailablePolicePatrol(Incident incident) {
         return agentList.stream()
-                .filter(agent -> agent instanceof PolicePatrol)
-                .map(agent -> (PolicePatrol) agent)
-                .filter(patrol -> patrol.getState() == PolicePatrol.State.PATROLLING)
-                .min(Comparator.comparingDouble(patrol -> calculateDistance(patrol.getPosition(), incident.getPosition())))
-                .orElse(null);
+                        .filter(agent -> agent instanceof PolicePatrol)
+                        .map(agent -> (PolicePatrol) agent)
+                        .filter(patrol -> patrol.getState() == PolicePatrol.State.PATROLLING)
+                        .min(Comparator.comparingDouble(patrol -> calculateDistance(patrol.getPosition(), incident.getPosition())))
+                        .orElse(null);
     }
 
     private double calculateDistance(Point p1, Point p2) {
         return Math.sqrt(Math.pow(p1.x() - p2.x(), 2) + Math.pow(p1.y() - p2.y(), 2));
     }
+
+    public int getSimulationDuration() {
+        return simulationDuration;
+    }
+
+    public void setSimulationDuration(int simulationDuration) {
+        this.simulationDuration = simulationDuration;
+    }
+
+    public void incrementSimulationDuration() {
+        this.simulationDuration++;
+    }
+
+    public boolean isSimulationFinished() {
+        return simulationDuration >= SimulationConfig.SIMULATION_DURATION;
+    }
 }
+
