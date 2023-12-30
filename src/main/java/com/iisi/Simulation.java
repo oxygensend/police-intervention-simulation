@@ -18,19 +18,31 @@ public class Simulation {
         setUpPatrols();
 
         for (int i = 0; i < SimulationConfig.SIMULATION_DURATION; i++) {
-            makePatrolMove();
+            updatePatrolsState();
+            updateIncidentsState();
             generateNewIncidents();
+
             LOGGER.info("Sleeping for 5 seconds");
             Thread.sleep(5000);
         }
     }
 
-    private void makePatrolMove() {
+    private void updatePatrolsState() {
         for (var police : CITY.agentList) {
             if (police instanceof PolicePatrol) {
                 var previousPosition = police.getPosition();
                 ((PolicePatrol) police).step();
                 LOGGER.info("Patrol {} moved from {} to {}", police.id, previousPosition, police.getPosition());
+            }
+        }
+    }
+
+    private void updateIncidentsState() {
+        for (var incident : CITY.agentList) {
+            if (incident instanceof Incident) {
+                var previousPosition = incident.getPosition();
+                ((Incident) incident).step();
+                LOGGER.info("Incident {} moved from {} to {}", incident.id, previousPosition, incident.getPosition());
             }
         }
     }
