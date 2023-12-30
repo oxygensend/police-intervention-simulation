@@ -6,10 +6,12 @@ import java.util.UUID;
 
 public abstract class Agent {
     public final UUID id = UUID.randomUUID();
+    public final District district;
     protected Point position;
 
-    protected Agent(Point position) {
+    protected Agent(Point position, District district) {
         this.position = position;
+        this.district = district;
     }
 
     public Point getPosition() {
@@ -18,6 +20,10 @@ public abstract class Agent {
 
     public void setPosition(Point position) {
         this.position = position;
+    }
+
+    public void clear() {
+        district.removeTakenPosition(position);
     }
 
 

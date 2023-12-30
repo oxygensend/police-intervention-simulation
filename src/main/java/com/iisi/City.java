@@ -2,6 +2,7 @@ package com.iisi;
 
 import com.iisi.agents.Agent;
 import com.iisi.agents.District;
+import com.iisi.utils.Point;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,15 @@ public class City {
         return instance;
     }
 
+
+    public static boolean isValidPoint(int x, int y) {
+        return x >= 0 && x < SimulationConfig.GRID_WIDTH && y >= 0 && y < SimulationConfig.GRID_HEIGHT;
+    }
+
+    public boolean checkIfPositionIsTaken(Point p) {
+        return agentList.stream().findFirst().filter(a -> a.getPosition().equals(p)).isEmpty();
+    }
+
     public int getNeutralizedPatrolsTotal() {
         return neutralizedPatrolsTotal;
     }
@@ -48,5 +58,9 @@ public class City {
 
     public void addAgent(Agent entity) {
         agentList.add(entity);
+    }
+
+    public void removeAgent(Agent entity) {
+        agentList.remove(entity);
     }
 }

@@ -3,31 +3,66 @@ package com.iisi;
 import com.iisi.agents.District;
 import com.iisi.agents.PolicePatrol;
 import com.iisi.utils.ArrayUtils;
-import com.iisi.utils.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
 
 public class Simulation {
     private final static City CITY = City.instance();
     private final static Logger LOGGER = LoggerFactory.getLogger(Simulation.class);
-    private List<Point> positionsTaken;
 
-
-    public void run() {
-
+    public void run() throws InterruptedException {
         setUpPatrols();
 
+        for (int i = 0; i < SimulationConfig.SIMULATION_DURATION; i++) {
+            makePatrolMove();
+            LOGGER.info("Sleeping for 10 seconds");
+            Thread.sleep(10000);
+        }
     }
 
 
+    private void makePatrolMove() {
+        CITY.agentList.stream()
+                      .filter(PolicePatrol.class::isInstance)
+                      .forEach(p -> {
+                          var previousPosition = p.getPosition();
+                          ((PolicePatrol) p).step();
+                          LOGGER.info("Patrol {} moved from {} to {}", p.id, previousPosition, p.getPosition());
+                      });
+    }
+
+
+
+    private void setUpPatrols() {
+        int index = 1;
+        int[] patrolPerDistrict = calculateInitialPatrolPerDistrict();
+
+        for (var districtSet : SimulationConfig.DISTRICT_BOUNDARIES_CONFIG.entrySet()) {
+            var district = new District(index, districtSet.getKey(), districtSet.getValue(),
+                                        District.ThreatLevel.from(SimulationConfig.BASE_THREAT_LEVEL),
+                                        patrolPerDistrict[index - 1]);
+
+            LOGGER.info("District {} created with threatLevel {}", district.name, district.getThreatLevel());
+            City.instance().addDistrict(district);
+
+            for (int i = 0; i < district.initialNumberOfPatrols; i++) {
+                var patrolPosition = district.getRandomPositionInDistrict();
+                var patrol = new PolicePatrol(patrolPosition, district);
+                City.instance().addAgent(patrol);
+                LOGGER.info("Patrol {} created at the position {} in district {}", patrol.id, patrol.getPosition(), district.name);
+            }
+
+            index++;
+        }
+    }
+
     private int[] calculateInitialPatrolPerDistrict() {
 
-        int[] patrolPerDistrict = new int[SimulationConfig.DISTRICTS_CONFIG.size()];
-
+        int[] patrolPerDistrict = new int[SimulationConfig.DISTRICT_BOUNDARIES_CONFIG.size()];
         int sum;
         int j = 0;
+
         while (true) {
             sum = ArrayUtils.sumArray(patrolPerDistrict);
             if (sum == SimulationConfig.NUMBER_OF_PATROLS) {
@@ -42,45 +77,8 @@ public class Simulation {
         }
 
         return patrolPerDistrict;
-
     }
 
-    private void setUpPatrols() {
-        int index = 1;
-        int[] patrolPerDistrict = calculateInitialPatrolPerDistrict();
-
-
-        for (var districtSet : SimulationConfig.DISTRICTS_CONFIG.entrySet()) {
-            var district = new District(index, districtSet.getKey(), districtSet.getValue(),
-                                        District.ThreatLevel.from(SimulationConfig.BASE_THREAT_LEVEL),
-                                        patrolPerDistrict[index - 1]);
-
-            LOGGER.info("District {} created with threatLevel {}", district.name, district.getThreatLevel());
-            City.instance().addDistrict(district);
-
-            positionsTaken = new ArrayList<>();
-            for (int i = 0; i < district.initialNumberOfPatrols; i++) {
-                var patrolPosition = getRandomPositionInDistrict(district);
-                var patrol = new PolicePatrol(patrolPosition, district);
-                City.instance().addAgent(patrol);
-                LOGGER.info("Patrol {} created at the position {} in district {}", patrol.id, patrol.getPosition(), district.name);
-            }
-
-            index++;
-        }
-    }
-
-    private Point getRandomPositionInDistrict(District district) {
-        var temp = new Random().nextInt(district.allPointsInDistrict.size());
-        var patrolPosition = district.allPointsInDistrict.get(temp);
-        while (positionsTaken.contains(patrolPosition)) {
-            temp = new Random().nextInt(district.allPointsInDistrict.size());
-            patrolPosition = district.allPointsInDistrict.get(temp);
-        }
-        positionsTaken.add(patrolPosition);
-
-        return patrolPosition;
-    }
 
 //    private static List<District> generateRandomDistricts() {
 //        List<District> districts = new ArrayList<>();

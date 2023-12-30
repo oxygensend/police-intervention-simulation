@@ -21,8 +21,13 @@ public class SimulationConfig {
     public static final int MIN_FIRING_STRENGTH = 20;
     public static final int MAX_FIRING_STRENGTH = 90;
 
+    public static final Map<District.ThreatLevel, Integer> MAX_INCIDENTS_BY_THREAT_LEVEL_PER_1000_ITERATIONS = Map.of(
+            District.ThreatLevel.LOW, 2,
+            District.ThreatLevel.MEDIUM, 5,
+            District.ThreatLevel.HIGH, 10
+    );
 
-    public static final Map<District.Districts, List<Point>> DISTRICTS_CONFIG = Map.of(
+    public static final Map<District.Districts, List<Point>> DISTRICT_BOUNDARIES_CONFIG = Map.of(
             District.Districts.DISTRICT_1, List.of(
                     new Point(0, 0),
                     new Point(0, 49),

@@ -6,9 +6,9 @@ import com.iisi.utils.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 public class District {
-    private ThreatLevel threatLevel;
 
     public final int id;
 
@@ -25,6 +25,8 @@ public class District {
     public final List<Point> allPointsInDistrict;
 
     public final int initialNumberOfPatrols;
+    private ThreatLevel threatLevel;
+    private final List<Point> positionsTaken = new ArrayList<>();
 
     public District(int id, Districts name, List<Point> boundaries, ThreatLevel threatLevel, int initialNumberOfPatrols) {
         this.id = id;
@@ -56,6 +58,21 @@ public class District {
         return points;
     }
 
+    public Point getRandomPositionInDistrict() {
+        var temp = new Random().nextInt(allPointsInDistrict.size());
+        var patrolPosition = allPointsInDistrict.get(temp);
+        while (positionsTaken.contains(patrolPosition)) {
+            temp = new Random().nextInt(allPointsInDistrict.size());
+            patrolPosition = allPointsInDistrict.get(temp);
+        }
+        positionsTaken.add(patrolPosition);
+
+        return patrolPosition;
+    }
+
+    public void removeTakenPosition(Point position) {
+        positionsTaken.remove(position);
+    }
 
     public ThreatLevel getThreatLevel() {
         return threatLevel;
