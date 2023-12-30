@@ -1,10 +1,13 @@
 package com.iisi;
 
 import com.iisi.agents.District;
+import com.iisi.agents.Incident;
 import com.iisi.agents.PolicePatrol;
 import com.iisi.utils.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Random;
 
 
 public class Simulation {
@@ -16,23 +19,32 @@ public class Simulation {
 
         for (int i = 0; i < SimulationConfig.SIMULATION_DURATION; i++) {
             makePatrolMove();
-            LOGGER.info("Sleeping for 10 seconds");
-            Thread.sleep(10000);
+            generateNewIncidents();
+            LOGGER.info("Sleeping for 5 seconds");
+            Thread.sleep(5000);
         }
     }
 
-
     private void makePatrolMove() {
-        CITY.agentList.stream()
-                      .filter(PolicePatrol.class::isInstance)
-                      .forEach(p -> {
-                          var previousPosition = p.getPosition();
-                          ((PolicePatrol) p).step();
-                          LOGGER.info("Patrol {} moved from {} to {}", p.id, previousPosition, p.getPosition());
-                      });
+        for (var police : CITY.agentList) {
+            if (police instanceof PolicePatrol) {
+                var previousPosition = police.getPosition();
+                ((PolicePatrol) police).step();
+                LOGGER.info("Patrol {} moved from {} to {}", police.id, previousPosition, police.getPosition());
+            }
+        }
     }
 
-
+    private void generateNewIncidents() {
+        for (var district : CITY.districtList) {
+            var probability = SimulationConfig.PROBABILITY_OF_INCIDENT_BY_THREAT_LEVEL.get(district.getThreatLevel());
+            if (new Random().nextDouble() < probability) {
+                var incident = new Incident(district.getRandomPositionInDistrict(), district);
+                CITY.addAgent(incident);
+                LOGGER.info("Incident {} created at the position {} in district {}", incident.id, incident.getPosition(), district.name);
+            }
+        }
+    }
 
     private void setUpPatrols() {
         int index = 1;
