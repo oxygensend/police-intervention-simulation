@@ -2,10 +2,14 @@ package com.iisi;
 
 import com.iisi.agents.Agent;
 import com.iisi.agents.District;
+import com.iisi.agents.Incident;
+import com.iisi.agents.PolicePatrol;
 import com.iisi.utils.Point;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Random;
 
 public class City {
 
@@ -62,5 +66,25 @@ public class City {
 
     public void removeAgent(Agent entity) {
         agentList.remove(entity);
+    }
+
+    public Point getRandomPosition() {
+        Random rand = new Random();
+        int x = rand.nextInt(SimulationConfig.GRID_WIDTH);
+        int y = rand.nextInt(SimulationConfig.GRID_HEIGHT);
+        return new Point(x, y);
+    }
+
+    public PolicePatrol findNearestAvailablePolicePatrol(Incident incident) {
+        return agentList.stream()
+                .filter(agent -> agent instanceof PolicePatrol)
+                .map(agent -> (PolicePatrol) agent)
+                .filter(patrol -> patrol.getState() == PolicePatrol.State.PATROLLING)
+                .min(Comparator.comparingDouble(patrol -> calculateDistance(patrol.getPosition(), incident.getPosition())))
+                .orElse(null);
+    }
+
+    private double calculateDistance(Point p1, Point p2) {
+        return Math.sqrt(Math.pow(p1.x() - p2.x(), 2) + Math.pow(p1.y() - p2.y(), 2));
     }
 }

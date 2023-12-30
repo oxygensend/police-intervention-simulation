@@ -12,7 +12,7 @@ public class SimulationConfig {
     public static final int GRID_WIDTH = 100;
 
     public static final int SIMULATION_DURATION = 10000;
-    public static final int NUMBER_OF_PATROLS = 30;
+    public static final int NUMBER_OF_PATROLS = 3;
     public static final int BASE_THREAT_LEVEL = 1;
     public static final int BASE_PATROL_SPEED = 1;
     public static final int INTERVENTION_PATROL_SPEED = 2;

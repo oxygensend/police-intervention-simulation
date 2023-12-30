@@ -2,6 +2,7 @@ package com.iisi.agents;
 
 import com.iisi.utils.Point;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Incident extends Agent implements Stepable {
@@ -58,8 +59,15 @@ public class Incident extends Agent implements Stepable {
         return patrolsSolving;
     }
 
-    public void setPatrolsSolving(List<PolicePatrol> patrolsSolving) {
+    public void assignSolvingPatrol(List<PolicePatrol> patrolsSolving) {
         this.patrolsSolving = patrolsSolving;
+    }
+
+    public void assignSolvingPatrol(PolicePatrol patrol) {
+        if (this.patrolsSolving == null) {
+            this.patrolsSolving = new ArrayList<>();
+        }
+        this.patrolsSolving.add(patrol);
     }
 
     public List<PolicePatrol> getPatrolsReaching() {
@@ -68,5 +76,12 @@ public class Incident extends Agent implements Stepable {
 
     public void setPatrolsReaching(List<PolicePatrol> patrolsReaching) {
         this.patrolsReaching = patrolsReaching;
+    }
+
+    public void setPatrolsReaching(PolicePatrol patrol) {
+        if (this.patrolsReaching == null) {
+            this.patrolsReaching = new ArrayList<>();
+        }
+        this.patrolsReaching.add(patrol);
     }
 }

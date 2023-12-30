@@ -1,13 +1,17 @@
 package com.iisi;
 
 import com.iisi.agents.District;
+import com.iisi.agents.Headquarters;
 import com.iisi.agents.Incident;
 import com.iisi.agents.PolicePatrol;
 import com.iisi.utils.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 
 public class Simulation {
@@ -15,9 +19,10 @@ public class Simulation {
     private final static Logger LOGGER = LoggerFactory.getLogger(Simulation.class);
 
     public void run() throws InterruptedException {
-        setUpPatrols();
+        setUpAgents();
 
         for (int i = 0; i < SimulationConfig.SIMULATION_DURATION; i++) {
+            assignTasks();
             updatePatrolsState();
             updateIncidentsState();
             generateNewIncidents();
@@ -27,12 +32,20 @@ public class Simulation {
         }
     }
 
+    private void assignTasks() {
+        for (var headquarters : CITY.agentList) {
+            if (headquarters instanceof Headquarters) {
+                ((Headquarters) headquarters).assignTasks();
+            }
+        }
+    }
+
     private void updatePatrolsState() {
         for (var police : CITY.agentList) {
             if (police instanceof PolicePatrol) {
                 var previousPosition = police.getPosition();
                 ((PolicePatrol) police).step();
-                LOGGER.info("Patrol {} moved from {} to {}", police.id, previousPosition, police.getPosition());
+                LOGGER.info("Patrol {} moved from {} to {} | assigned task {}", police.id, previousPosition, police.getPosition(), ((PolicePatrol) police).getState());
             }
         }
     }
@@ -40,9 +53,8 @@ public class Simulation {
     private void updateIncidentsState() {
         for (var incident : CITY.agentList) {
             if (incident instanceof Incident) {
-                var previousPosition = incident.getPosition();
                 ((Incident) incident).step();
-                LOGGER.info("Incident {} moved from {} to {}", incident.id, previousPosition, incident.getPosition());
+                LOGGER.info("Incident {} at {}", incident.id, incident.getPosition());
             }
         }
     }
@@ -58,7 +70,7 @@ public class Simulation {
         }
     }
 
-    private void setUpPatrols() {
+    private void setUpAgents() {
         int index = 1;
         int[] patrolPerDistrict = calculateInitialPatrolPerDistrict();
 
@@ -79,6 +91,12 @@ public class Simulation {
 
             index++;
         }
+
+        var position = City.instance().getRandomPosition();
+        District district = City.instance().districtList.get(0);
+        Headquarters headquarters = new Headquarters(position, district);
+        CITY.addAgent(headquarters);
+        LOGGER.info("Headquarters created at the position [{},{}]", position.x(), position.y());
     }
 
     private int[] calculateInitialPatrolPerDistrict() {

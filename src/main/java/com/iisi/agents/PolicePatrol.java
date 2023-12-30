@@ -3,6 +3,8 @@ package com.iisi.agents;
 import com.iisi.City;
 import com.iisi.SimulationConfig;
 import com.iisi.utils.Point;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PolicePatrol extends Agent implements Stepable {
 
@@ -11,6 +13,8 @@ public class PolicePatrol extends Agent implements Stepable {
     public final int baseSpeed = SimulationConfig.BASE_PATROL_SPEED;
     public final int interventionSpeed = SimulationConfig.INTERVENTION_PATROL_SPEED;
     private int durationOfShift = 0;
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(PolicePatrol.class);
 
     public PolicePatrol(Point position, District district) {
         super(position, district);
@@ -32,7 +36,10 @@ public class PolicePatrol extends Agent implements Stepable {
         switch (state) {
             case PATROLLING:
                 randomStepInDistrict();
+                break;
             case TRANSFER_TO_INTERVENTION:
+                moveToIncidentPlace();
+                break;
             case TRANSFER_TO_FIRING:
             case FIRING:
             case INTERVENTION:
@@ -68,8 +75,42 @@ public class PolicePatrol extends Agent implements Stepable {
         }
     }
 
+    public void moveToIncidentPlace() {
+        Incident assignedIncident = City.instance().agentList.stream()
+                .filter(agent -> agent instanceof Incident)
+                .map(agent -> (Incident) agent)
+                .filter(incident -> incident.getPatrolsReaching().stream()
+                        .anyMatch(patrol -> patrol.id.equals(this.id)))
+                .findFirst()
+                .orElse(null);
+
+        if (assignedIncident != null) {
+            Point incidentPosition = assignedIncident.getPosition();
+
+            int deltaX = Integer.compare(incidentPosition.x(), position.x());
+            int deltaY = Integer.compare(incidentPosition.y(), position.y());
+
+            Point newPosition = new Point(position.x() + deltaX * interventionSpeed,
+                    position.y() + deltaY * interventionSpeed);
+
+            if (Math.abs(incidentPosition.x() - position.x()) <= interventionSpeed &&
+                    Math.abs(incidentPosition.y() - position.y()) <= interventionSpeed) {
+                position = incidentPosition;
+                state = State.INTERVENTION;
+            } else if (City.isValidPoint(newPosition.x(), newPosition.y()) &&
+                    City.instance().checkIfPositionIsTaken(newPosition)) {
+                position = newPosition;
+            }
+        }
+    }
+
+
     public State getState() {
         return state;
+    }
+
+    public void takeTask() {
+        state = State.TRANSFER_TO_INTERVENTION;
     }
 
     public void setState(State state) {
