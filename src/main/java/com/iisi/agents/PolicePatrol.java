@@ -56,6 +56,7 @@ public class PolicePatrol extends Agent implements Stepable {
                 case 1 -> x -= baseSpeed;
                 case 2 -> y += baseSpeed;
                 case 3 -> y -= baseSpeed;
+                // if random is 4, then the agent stays in the same position
             }
 
             newPoint = new Point(x, y);
