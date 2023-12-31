@@ -75,11 +75,11 @@ public class City {
 
     public PolicePatrol findNearestAvailablePolicePatrol(Incident incident) {
         return agentList.stream()
-                        .filter(agent -> agent instanceof PolicePatrol)
-                        .map(agent -> (PolicePatrol) agent)
-                        .filter(patrol -> patrol.getState() == PolicePatrol.State.PATROLLING)
-                        .min(Comparator.comparingDouble(patrol -> calculateDistance(patrol.getPosition(), incident.getPosition())))
-                        .orElse(null);
+                .filter(agent -> agent instanceof PolicePatrol)
+                .map(agent -> (PolicePatrol) agent)
+                .filter(patrol -> patrol.getState() == PolicePatrol.State.PATROLLING)
+                .min(Comparator.comparingDouble(patrol -> calculateDistance(patrol.getPosition(), incident.getPosition())))
+                .orElse(null);
     }
 
     private double calculateDistance(Point p1, Point p2) {

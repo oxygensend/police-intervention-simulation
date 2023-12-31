@@ -32,13 +32,17 @@ public class Headquarters extends Agent {
                                .collect(Collectors.toList());
 
         for (Incident incident : incidents) {
-            if ((incident).getPatrolsReaching().isEmpty() && (incident).getPatrolsSolving().isEmpty()) {
+            if ((incident.getPatrolsReaching().isEmpty() && incident.getPatrolsSolving().isEmpty() || incident.isFiring())) {
                 PolicePatrol availablePatrol;
                 availablePatrol = City.instance().findNearestAvailablePolicePatrol(incident);
                 if (availablePatrol != null) {
                     availablePatrol.takeTask(incident);
                     incident.setPatrolsReaching(availablePatrol);
-                    LOGGER.info("Patrol {} is going to incident at {}", availablePatrol.id, incident.position);
+                    if (incident.isFiring()) {
+                        LOGGER.info("Support patrol {} is going to firing at {}", availablePatrol.id, incident.position);
+                    } else {
+                        LOGGER.info("Patrol {} is going to incident at {}", availablePatrol.id, incident.position);
+                    }
                     break;
                 }
             }

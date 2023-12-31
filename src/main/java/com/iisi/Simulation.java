@@ -24,7 +24,7 @@ public class Simulation {
 
             CITY.incrementSimulationDuration();
             LOGGER.info("Sleeping for 5 seconds");
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }
     }
 
@@ -60,7 +60,9 @@ public class Simulation {
         for (var incident : CITY.agentList) {
             if (incident instanceof Incident) {
                 ((Incident) incident).step();
-                LOGGER.info("Incident {} at {}", incident.id, incident.getPosition());
+                if(incident.isActive()) {
+                    LOGGER.info("Incident {} at {}", incident.id, incident.getPosition());
+                }
             }
         }
     }

@@ -26,8 +26,7 @@ public class PolicePatrol extends Agent implements Stepable {
 
     public enum State {
         PATROLLING,
-        TRANSFER_TO_INTERVENTION,
-        TRANSFER_TO_FIRING,
+        TRANSFER_TO_INTERVENTION, TRANSFER_TO_FIRING,
         INTERVENTION,
         FIRING,
         NEUTRALIZED,

@@ -37,6 +37,14 @@ public class Incident extends Agent implements Stepable {
         }
 
         if (isFiring) {
+            var patrol = patrolsSolving.stream().findFirst().orElseThrow();
+
+            int currentSimulationIteration = City.instance().getSimulationDuration();
+            int elapsedTime = currentSimulationIteration - patrol.getAssignedTask().getIterationAtStart();
+            double firingProbability = calculateFiringProbability(elapsedTime);
+            this.isFiring = new Random().nextDouble() < firingProbability;
+
+            LOGGER.info("Incident {} has started firing!", this.id);
 
         } else {
             var patrol = patrolsSolving.stream().findFirst().orElseThrow();
@@ -46,9 +54,13 @@ public class Incident extends Agent implements Stepable {
                 isActive = false;
                 patrol.step();
             }
-
         }
+    }
 
+    private double calculateFiringProbability(int elapsedTime) {
+        double maxProbability = 1.0;
+        double incrementPerIteration = maxProbability / (double) this.duration;
+        return Math.min(elapsedTime * incrementPerIteration, maxProbability);
     }
 
     public double getProbabilityOfFire() {
