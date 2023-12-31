@@ -10,10 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static com.iisi.agents.PolicePatrol.State.FIRING_TO_PATROLLING;
+
 public class Incident extends Agent implements Stepable {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(Incident.class);
-    public final int duration;
+    public int duration;
     private double probabilityOfFire;
     private boolean isFiring = false;
     private double strength;
@@ -34,17 +36,38 @@ public class Incident extends Agent implements Stepable {
     public void step() {
         if (patrolsSolving.isEmpty()) {
             return;
+        } else {
+            if (!isFiring) {
+                duration = duration + new Random().nextInt(SimulationConfig.MAX_INTERVENTION_DURATION - SimulationConfig.MIN_INTERVENTION_DURATION)
+                        + SimulationConfig.MIN_INTERVENTION_DURATION;
+                ;
+                var patrol = patrolsSolving.stream().findFirst().orElseThrow();
+
+                int currentSimulationIteration = City.instance().getSimulationDuration();
+                int elapsedTime = currentSimulationIteration - patrol.getAssignedTask().getIterationAtStart();
+                double firingProbability = calculateFiringProbability(elapsedTime);
+                double random = new Random().nextDouble();
+                this.isFiring = random < firingProbability;
+                if (isFiring) {
+                    LOGGER.info("Incident has started firing! {} {}", random, firingProbability);
+                }
+            }
         }
 
-        if (isFiring) {
-            var patrol = patrolsSolving.stream().findFirst().orElseThrow();
+        if (isFiring && patrolsSolving.size() != 1) {
+            boolean isEveryPatrolOnFire = patrolsSolving.stream()
+                    .allMatch(patrol -> patrol.getState().equals(PolicePatrol.State.FIRING));
 
-            int currentSimulationIteration = City.instance().getSimulationDuration();
-            int elapsedTime = currentSimulationIteration - patrol.getAssignedTask().getIterationAtStart();
-            double firingProbability = calculateFiringProbability(elapsedTime);
-            this.isFiring = new Random().nextDouble() < firingProbability;
-
-            LOGGER.info("Incident {} has started firing!", this.id);
+            if (isEveryPatrolOnFire) {
+                LOGGER.info("Firing {} at {} is solved. Removing...", id, position);
+                isActive = false;
+                for (PolicePatrol patrol : patrolsSolving) {
+                    patrol.setState(FIRING_TO_PATROLLING);
+                    patrol.step();
+                }
+                patrolsReaching = null;
+                patrolsSolving = null;
+            }
 
         } else {
             var patrol = patrolsSolving.stream().findFirst().orElseThrow();
@@ -53,6 +76,8 @@ public class Incident extends Agent implements Stepable {
                 LOGGER.info("Incident {} at {} is solved. Removing...", id, position);
                 isActive = false;
                 patrol.step();
+                patrolsReaching = null;
+                patrolsSolving = null;
             }
         }
     }
@@ -108,6 +133,12 @@ public class Incident extends Agent implements Stepable {
             this.patrolsSolving = new ArrayList<>();
         }
         this.patrolsSolving.add(patrol);
+    }
+
+    public void removeReachingPatrol(PolicePatrol patrol) {
+        if (this.patrolsReaching != null) {
+            patrolsReaching.remove(patrol);
+        }
     }
 
     public List<PolicePatrol> getPatrolsReaching() {

@@ -23,8 +23,8 @@ public class Simulation {
             removeInActiveAgents();
 
             CITY.incrementSimulationDuration();
-            LOGGER.info("Sleeping for 5 seconds");
-            Thread.sleep(3000);
+            LOGGER.info("Sleeping for 5 seconds------------------------------------------------------------------");
+            Thread.sleep(2000);
         }
     }
 

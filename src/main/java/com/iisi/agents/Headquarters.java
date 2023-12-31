@@ -23,26 +23,29 @@ public class Headquarters extends Agent {
     public void assignTasks() {
         var allEntities = City.instance().agentList;
         patrols = allEntities.stream()
-                             .filter(x -> x instanceof PolicePatrol && x.isActive())
-                             .map(x -> (PolicePatrol) x)
-                             .collect(Collectors.toList());
+                .filter(x -> x instanceof PolicePatrol && x.isActive())
+                .map(x -> (PolicePatrol) x)
+                .collect(Collectors.toList());
         incidents = allEntities.stream()
-                               .filter(x -> x instanceof Incident && x.isActive())
-                               .map(x -> (Incident) x)
-                               .collect(Collectors.toList());
+                .filter(x -> x instanceof Incident && x.isActive())
+                .map(x -> (Incident) x)
+                .collect(Collectors.toList());
 
         for (Incident incident : incidents) {
-            if ((incident.getPatrolsReaching().isEmpty() && incident.getPatrolsSolving().isEmpty() || incident.isFiring())) {
+            if ((incident.getPatrolsReaching().isEmpty() && incident.getPatrolsSolving().isEmpty()) || incident.isFiring()) {
                 PolicePatrol availablePatrol;
                 availablePatrol = City.instance().findNearestAvailablePolicePatrol(incident);
                 if (availablePatrol != null) {
-                    availablePatrol.takeTask(incident);
-                    incident.setPatrolsReaching(availablePatrol);
-                    if (incident.isFiring()) {
+                    if (incident.isFiring() && (incident.getPatrolsSolving().size() == 1 && incident.getPatrolsReaching().isEmpty())) {
+                        availablePatrol.takeTask(incident);
+                        incident.setPatrolsReaching(availablePatrol);
                         LOGGER.info("Support patrol {} is going to firing at {}", availablePatrol.id, incident.position);
-                    } else {
+                    } else if (incident.getPatrolsReaching().isEmpty()){
+                        availablePatrol.takeTask(incident);
+                        incident.setPatrolsReaching(availablePatrol);
                         LOGGER.info("Patrol {} is going to incident at {}", availablePatrol.id, incident.position);
                     }
+
                     break;
                 }
             }

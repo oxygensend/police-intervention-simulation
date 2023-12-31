@@ -3,10 +3,7 @@ package com.iisi.agents;
 import com.iisi.City;
 import com.iisi.utils.Point;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class District {
 
@@ -35,6 +32,19 @@ public class District {
         this.allPointsInDistrict = fillBoardWithDistrictPoints();
         this.threatLevel = threatLevel;
         this.initialNumberOfPatrols = initialNumberOfPatrols;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        District district = (District) o;
+        return id == district.id && initialNumberOfPatrols == district.initialNumberOfPatrols && name == district.name && Objects.equals(boundaries, district.boundaries) && Objects.equals(allPointsInDistrict, district.allPointsInDistrict) && threatLevel == district.threatLevel && Objects.equals(positionsTaken, district.positionsTaken);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, boundaries, allPointsInDistrict, initialNumberOfPatrols, threatLevel, positionsTaken);
     }
 
     private List<Point> fillBoardWithDistrictPoints() {
@@ -109,4 +119,11 @@ public class District {
         DISTRICT_4
     }
 
+
+    public Point findTheNearestPointFromDifferentDistrict(Point point) {
+        return allPointsInDistrict.stream()
+                                  .min(Comparator.comparingDouble(p -> Point.calculateDistance(p, point)))
+                                  .orElse(null);
+
+    }
 }
