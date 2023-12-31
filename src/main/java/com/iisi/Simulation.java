@@ -24,7 +24,7 @@ public class Simulation {
 
             CITY.incrementSimulationDuration();
             LOGGER.info("Sleeping for 5 seconds");
-            Thread.sleep(1000);
+            Thread.sleep(100);
         }
     }
 

@@ -120,4 +120,6 @@ public class Incident extends Agent implements Stepable {
     public void setActive(boolean isActive) {
         this.isActive = isActive;
     }
+
+
 }
