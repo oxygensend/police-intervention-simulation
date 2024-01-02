@@ -5,12 +5,14 @@ import com.iisi.agents.District;
 import com.iisi.agents.Incident;
 import com.iisi.agents.PolicePatrol;
 import com.iisi.utils.Point;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 public class City {
 
-    public static final int SHIFT_DURATION = 50;
+    private static final Logger LOGGER = LoggerFactory.getLogger(City.class);
     private static City instance;
     public final int[][] grid;
     public final List<Agent> agentList;
@@ -97,5 +99,42 @@ public class City {
     public boolean isSimulationFinished() {
         return simulationDuration >= SimulationConfig.SIMULATION_DURATION;
     }
+
+    public Map<District, Double> calculateDangerLevelsAndPatrolNumberToDistrict() {
+        int[] requiredPatrolsForDistrict = new int[districtList.size()];
+        Arrays.fill(requiredPatrolsForDistrict, 1);
+        double sumOfDangerCoefficients = districtList.stream().mapToDouble(District::calculateDangerCoefficient).sum();
+        int totalPatrolsAssigned = 0;
+        LOGGER.info("Sum of danger coefficients: {}", sumOfDangerCoefficients);
+        var map = new HashMap<District, Double>();
+
+        for (var district :
+                districtList) {
+
+            double normalizedDanger = district.calculateDangerCoefficient() / sumOfDangerCoefficients;
+            LOGGER.info("Normalized danger for district {}: {}", district.name, normalizedDanger);
+
+            // Calculate the number of patrols for the district based on the normalized danger
+            int numberOfPatrols = (int) Math.ceil(normalizedDanger * SimulationConfig.NUMBER_OF_PATROLS);
+
+            // Ensure each district has at least one patrol
+            numberOfPatrols = Math.max(numberOfPatrols, 1);
+
+            // Ensure the total number of patrols doesn't exceed maximum value
+            numberOfPatrols = Math.min(numberOfPatrols, SimulationConfig.NUMBER_OF_PATROLS - totalPatrolsAssigned);
+
+            LOGGER.info("Number of patrols for district {}: {}", district.name, numberOfPatrols);
+            district.setDangerCoefficient(normalizedDanger);
+            district.setNumberOfPatrols(numberOfPatrols);
+            totalPatrolsAssigned += numberOfPatrols;
+
+            map.put(district, normalizedDanger);
+
+        }
+
+        return map;
+
+    }
+
 }
 

@@ -1,6 +1,7 @@
 package com.iisi.agents;
 
 import com.iisi.City;
+import com.iisi.DistrictStatistics;
 import com.iisi.utils.Point;
 
 import java.util.*;
@@ -22,8 +23,12 @@ public class District {
     public final List<Point> allPointsInDistrict;
 
     public final int initialNumberOfPatrols;
+
+    public final DistrictStatistics statistics = new DistrictStatistics();
     private ThreatLevel threatLevel;
     private final List<Point> positionsTaken = new ArrayList<>();
+    private double dangerCoefficient = 0;
+    private int numberOfPatrols;
 
     public District(int id, Districts name, List<Point> boundaries, ThreatLevel threatLevel, int initialNumberOfPatrols) {
         this.id = id;
@@ -32,6 +37,7 @@ public class District {
         this.allPointsInDistrict = fillBoardWithDistrictPoints();
         this.threatLevel = threatLevel;
         this.initialNumberOfPatrols = initialNumberOfPatrols;
+        this.numberOfPatrols = initialNumberOfPatrols;
     }
 
     @Override
@@ -92,6 +98,34 @@ public class District {
         this.threatLevel = threatLevel;
     }
 
+
+    public Point findTheNearestPointFromDifferentDistrict(Point point) {
+        return allPointsInDistrict.stream()
+                                  .min(Comparator.comparingDouble(p -> Point.calculateDistance(p, point)))
+                                  .orElse(null);
+
+    }
+
+    public double calculateDangerCoefficient() {
+        return statistics.calculateDangerCoefficient();
+    }
+
+    public double getDangerCoefficient() {
+        return dangerCoefficient;
+    }
+
+    public void setDangerCoefficient(double dangerCoefficient) {
+        this.dangerCoefficient = dangerCoefficient;
+    }
+
+    public int getNumberOfPatrols() {
+        return numberOfPatrols;
+    }
+
+    public void setNumberOfPatrols(int numberOfPatrols) {
+        this.numberOfPatrols = numberOfPatrols;
+    }
+
     public static enum ThreatLevel {
         LOW(1),
         MEDIUM(2),
@@ -120,10 +154,4 @@ public class District {
     }
 
 
-    public Point findTheNearestPointFromDifferentDistrict(Point point) {
-        return allPointsInDistrict.stream()
-                                  .min(Comparator.comparingDouble(p -> Point.calculateDistance(p, point)))
-                                  .orElse(null);
-
-    }
 }

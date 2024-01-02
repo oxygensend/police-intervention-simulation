@@ -18,6 +18,7 @@ public class PolicePatrol extends Agent implements Stepable {
     private int durationOfShift = 0;
     private Task assignedTask;
     private final static Logger LOGGER = LoggerFactory.getLogger(PolicePatrol.class);
+    private boolean removeAfterIntervention = false;
 
     public PolicePatrol(Point position, District district) {
         super(position, district);
@@ -27,7 +28,8 @@ public class PolicePatrol extends Agent implements Stepable {
 
     public enum State {
         PATROLLING,
-        TRANSFER_TO_INTERVENTION, TRANSFER_TO_FIRING,
+        TRANSFER_TO_INTERVENTION,
+        TRANSFER_TO_FIRING,
         INTERVENTION,
         FIRING,
         NEUTRALIZED,
@@ -36,6 +38,8 @@ public class PolicePatrol extends Agent implements Stepable {
 
 
     public void step() {
+        durationOfShift++;
+
         switch (state) {
             case PATROLLING:
                 patrollingStep();
@@ -54,6 +58,15 @@ public class PolicePatrol extends Agent implements Stepable {
                 firingToPatrollingStep();
                 break;
         }
+
+        if (isRemoveAfterIntervention() && isFreeState()) {
+            LOGGER.info("Patrol {} finished shift after intervention at {}", id, City.instance().getSimulationDuration());
+            isActive = false;
+        }
+    }
+
+    public boolean isFreeState() {
+        return state == State.PATROLLING || state == State.FIRING_TO_PATROLLING;
     }
 
     private void patrollingStep() {
@@ -65,7 +78,7 @@ public class PolicePatrol extends Agent implements Stepable {
     }
 
     private void headingBackToDistrict() {
-        if(state == State.FIRING_TO_PATROLLING) {
+        if (state == State.FIRING_TO_PATROLLING) {
             state = State.PATROLLING;
         }
         var headingBackToDistrictTask = (HeadingBackToDistrictTask) assignedTask;
@@ -154,7 +167,7 @@ public class PolicePatrol extends Agent implements Stepable {
             state = State.PATROLLING;
             assignedTask = null;
             LOGGER.info("Patrol {} finished intervention at {}. Changing state to {}", id, position, state);
-        } else if (incident.isFiring()) {
+        } else if (incident.isFiring() && incident.isActive() && state != State.FIRING) {
             state = State.FIRING;
             assignedTask = new SolvingIncidentTask(incident, City.instance().getSimulationDuration());
             LOGGER.info("Patrol {} started firing at {}. Changing state to {}", id, position, state);
@@ -195,4 +208,17 @@ public class PolicePatrol extends Agent implements Stepable {
     public Task getAssignedTask() {
         return assignedTask;
     }
+
+    public boolean isShiftOver() {
+        return durationOfShift > SimulationConfig.SHIFT_DURATION;
+    }
+
+    public void removeAfterIntervention() {
+        this.removeAfterIntervention = true;
+    }
+
+    public boolean isRemoveAfterIntervention() {
+        return removeAfterIntervention;
+    }
+
 }

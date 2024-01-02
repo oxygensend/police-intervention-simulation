@@ -31,4 +31,12 @@ public abstract class Agent {
         return isActive;
     }
 
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+    public void deactivate() {
+        isActive = false;
+    }
+
+
 }

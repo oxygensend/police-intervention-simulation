@@ -30,6 +30,7 @@ public class Incident extends Agent implements Stepable {
         isActive = true;
         duration = new Random().nextInt(SimulationConfig.MAX_INTERVENTION_DURATION - SimulationConfig.MIN_INTERVENTION_DURATION)
                 + SimulationConfig.MIN_INTERVENTION_DURATION;
+        district.statistics.incrementNumberOfInterventions();
     }
 
     @Override
@@ -49,6 +50,7 @@ public class Incident extends Agent implements Stepable {
                 double random = new Random().nextDouble();
                 this.isFiring = random < firingProbability;
                 if (isFiring) {
+                    district.statistics.incrementNumberOfFirings();
                     LOGGER.info("Incident has started firing! {} {}", random, firingProbability);
                 }
             }
@@ -56,7 +58,7 @@ public class Incident extends Agent implements Stepable {
 
         if (isFiring && patrolsSolving.size() != 1) {
             boolean isEveryPatrolOnFire = patrolsSolving.stream()
-                    .allMatch(patrol -> patrol.getState().equals(PolicePatrol.State.FIRING));
+                                                        .allMatch(patrol -> patrol.getState().equals(PolicePatrol.State.FIRING));
 
             if (isEveryPatrolOnFire) {
                 LOGGER.info("Firing {} at {} is solved. Removing...", id, position);
@@ -67,6 +69,8 @@ public class Incident extends Agent implements Stepable {
                 }
                 patrolsReaching = null;
                 patrolsSolving = null;
+
+                district.statistics.incrementNumberOfSolvedFirings();
             }
 
         } else {
@@ -78,6 +82,8 @@ public class Incident extends Agent implements Stepable {
                 patrol.step();
                 patrolsReaching = null;
                 patrolsSolving = null;
+
+                district.statistics.incrementNumberOfSolvedInterventions();
             }
         }
     }

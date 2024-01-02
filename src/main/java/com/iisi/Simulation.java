@@ -23,8 +23,15 @@ public class Simulation {
             removeInActiveAgents();
 
             CITY.incrementSimulationDuration();
+
+            if (i != 0 && i % SimulationConfig.SHIFT_DURATION == 0) {
+                LOGGER.info("Shift is over!------------------------------------------------------------------");
+                changeShifts();
+                LOGGER.info("Shift is changed!------------------------------------------------------------------");
+            }
+
             LOGGER.info("Sleeping for 5 seconds------------------------------------------------------------------");
-            Thread.sleep(2000);
+            Thread.sleep(100);
         }
     }
 
@@ -40,18 +47,34 @@ public class Simulation {
         }
     }
 
+    private void changeShifts() {
+        var headquarters = CITY.agentList.stream().filter(x -> x instanceof Headquarters).toList();
+        for (var headquarter : headquarters) {
+            if (headquarter instanceof Headquarters) {
+                ((Headquarters) headquarter).newShift();
+            }
+        }
+    }
+
     private void updatePatrolsState() {
         for (var police : CITY.agentList) {
-            if (police instanceof PolicePatrol) {
+            if (police instanceof PolicePatrol agent) {
                 var previousPosition = police.getPosition();
-                ((PolicePatrol) police).step();
+                agent.step();
                 if (!previousPosition.equals(police.getPosition())) {
                     LOGGER.info("Patrol {} moved from {} to {} | assigned task {}", police.id, previousPosition, police.getPosition(), ((PolicePatrol) police).getState());
                 } else if (((PolicePatrol) police).getState() == PolicePatrol.State.INTERVENTION) {
                     LOGGER.info("Patrol {} is in intervention", police.id);
+                } else if (((PolicePatrol) police).getState() == PolicePatrol.State.TRANSFER_TO_INTERVENTION) {
+                    LOGGER.info("Patrol {} is in transfer to intervention", police.id);
+                } else if (((PolicePatrol) police).getState() == PolicePatrol.State.TRANSFER_TO_FIRING) {
+                    LOGGER.info("Patrol {} is in transfer to firing", police.id);
                 } else if (((PolicePatrol) police).getState() == PolicePatrol.State.FIRING) {
                     LOGGER.info("Patrol {} is in firing", police.id);
+                } else {
+                    LOGGER.info("Patrol {} is in patrolling at {}", police.id, police.getPosition());
                 }
+
             }
         }
     }
@@ -60,7 +83,7 @@ public class Simulation {
         for (var incident : CITY.agentList) {
             if (incident instanceof Incident) {
                 ((Incident) incident).step();
-                if(incident.isActive()) {
+                if (incident.isActive()) {
                     LOGGER.info("Incident {} at {}", incident.id, incident.getPosition());
                 }
             }
@@ -106,6 +129,7 @@ public class Simulation {
         CITY.addAgent(headquarters);
         LOGGER.info("Headquarters created at the position [{},{}]", position.x(), position.y());
     }
+
 
     private int[] calculateInitialPatrolPerDistrict() {
 
