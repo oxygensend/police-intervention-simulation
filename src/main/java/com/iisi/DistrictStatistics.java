@@ -86,7 +86,7 @@ public class DistrictStatistics {
         return (0.3 * numberOfInterventions +
                 0.4 * numberOfFirings +
                 0.2 * numberOfSolvedInterventions +
-                0.1 * numberOfSolvedFirings -
+                0.1 * numberOfSolvedFirings +
                 0.4 * numberOfNeutralizedPatrols +
                 0.2 * numberOfPatrolsComingFromOtherDistricts) / (numberOfPatrols + 1);
     }

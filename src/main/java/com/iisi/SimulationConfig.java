@@ -24,8 +24,8 @@ public class SimulationConfig {
 
     public static final Map<District.ThreatLevel, Double> PROBABILITY_OF_INCIDENT_BY_THREAT_LEVEL = Map.of(
             District.ThreatLevel.LOW, 0.01,
-            District.ThreatLevel.MEDIUM, 0.05,
-            District.ThreatLevel.HIGH, 0.2
+            District.ThreatLevel.MEDIUM, 0.02,
+            District.ThreatLevel.HIGH, 0.03
     );
 
     public static final Map<District.Districts, List<Point>> DISTRICT_BOUNDARIES_CONFIG = Map.of(
@@ -53,6 +53,13 @@ public class SimulationConfig {
                     new Point(99, 99),
                     new Point(99, 50)
             )
+    );
+
+    public static final Map<District.Districts, District.ThreatLevel> DISTRICTS_THREAT_LEVEL_CONFIG = Map.of(
+            District.Districts.DISTRICT_1, District.ThreatLevel.LOW,
+            District.Districts.DISTRICT_2, District.ThreatLevel.MEDIUM,
+            District.Districts.DISTRICT_3, District.ThreatLevel.HIGH,
+            District.Districts.DISTRICT_4, District.ThreatLevel.LOW
     );
 
 

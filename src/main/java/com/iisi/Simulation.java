@@ -15,7 +15,7 @@ public class Simulation {
     public void run() throws InterruptedException {
         setUpAgents();
 
-        for (int i = 0; i < SimulationConfig.SIMULATION_DURATION; i++) {
+        while (CITY.getSimulationDuration() < SimulationConfig.SIMULATION_DURATION) {
             assignTasks();
             updatePatrolsState();
             updateIncidentsState();
@@ -24,7 +24,7 @@ public class Simulation {
 
             CITY.incrementSimulationDuration();
 
-            if (i != 0 && i % SimulationConfig.SHIFT_DURATION == 0) {
+            if (CITY.getSimulationDuration() != 0 && CITY.getSimulationDuration() % SimulationConfig.SHIFT_DURATION == 0) {
                 LOGGER.info("Shift is over!------------------------------------------------------------------");
                 changeShifts();
                 LOGGER.info("Shift is changed!------------------------------------------------------------------");
@@ -94,7 +94,8 @@ public class Simulation {
         for (var district : CITY.districtList) {
             var probability = SimulationConfig.PROBABILITY_OF_INCIDENT_BY_THREAT_LEVEL.get(district.getThreatLevel());
             if (new Random().nextDouble() < probability) {
-                var incident = new Incident(district.getRandomPositionInDistrict(), district);
+                var priority = Incident.Priority.getRandomPriority();
+                var incident = new Incident(district.getRandomPositionInDistrict(), district, priority);
                 CITY.addAgent(incident);
                 LOGGER.info("Incident {} created at the position {} in district {}", incident.id, incident.getPosition(), district.name);
             }
@@ -107,7 +108,7 @@ public class Simulation {
 
         for (var districtSet : SimulationConfig.DISTRICT_BOUNDARIES_CONFIG.entrySet()) {
             var district = new District(index, districtSet.getKey(), districtSet.getValue(),
-                                        District.ThreatLevel.from(SimulationConfig.BASE_THREAT_LEVEL),
+                                        SimulationConfig.DISTRICTS_THREAT_LEVEL_CONFIG.get(districtSet.getKey()),
                                         patrolPerDistrict[index - 1]);
 
             LOGGER.info("District {} created with threatLevel {}", district.name, district.getThreatLevel());

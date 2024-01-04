@@ -22,14 +22,17 @@ public class Incident extends Agent implements Stepable {
     private int requiredPatrols;
     private List<PolicePatrol> patrolsSolving = new ArrayList<>();
     private List<PolicePatrol> patrolsReaching = new ArrayList<>();
-
     private boolean isActive;
+    private Priority priority;
+    private final int createdAt;
 
-    public Incident(Point position, District district) {
+    public Incident(Point position, District district, Priority priority) {
         super(position, district);
-        isActive = true;
-        duration = new Random().nextInt(SimulationConfig.MAX_INTERVENTION_DURATION - SimulationConfig.MIN_INTERVENTION_DURATION)
+        this.isActive = true;
+        this.priority = priority;
+        this.duration = new Random().nextInt(SimulationConfig.MAX_INTERVENTION_DURATION - SimulationConfig.MIN_INTERVENTION_DURATION)
                 + SimulationConfig.MIN_INTERVENTION_DURATION;
+        this.createdAt = City.instance().getSimulationDuration();
         district.statistics.incrementNumberOfInterventions();
     }
 
@@ -41,7 +44,7 @@ public class Incident extends Agent implements Stepable {
             if (!isFiring) {
                 duration = duration + new Random().nextInt(SimulationConfig.MAX_INTERVENTION_DURATION - SimulationConfig.MIN_INTERVENTION_DURATION)
                         + SimulationConfig.MIN_INTERVENTION_DURATION;
-                ;
+
                 var patrol = patrolsSolving.stream().findFirst().orElseThrow();
 
                 int currentSimulationIteration = City.instance().getSimulationDuration();
@@ -52,6 +55,7 @@ public class Incident extends Agent implements Stepable {
                 if (isFiring) {
                     district.statistics.incrementNumberOfFirings();
                     LOGGER.info("Incident has started firing! {} {}", random, firingProbability);
+                    priority = Priority.PRIOR;
                 }
             }
         }
@@ -168,5 +172,34 @@ public class Incident extends Agent implements Stepable {
 
     public void setActive(boolean isActive) {
         this.isActive = isActive;
+    }
+
+    public Priority getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Priority priority) {
+        this.priority = priority;
+    }
+
+    public int getCreatedAt() {
+        return createdAt;
+    }
+
+    public static enum Priority {
+        LOW(4),
+        MEDIUM(3),
+        HIGH(2),
+        PRIOR(1);
+
+        public final int value;
+
+        Priority(int value) {
+            this.value = value;
+        }
+
+        public static Priority getRandomPriority() {
+            return values()[(int) (Math.random() * (values().length - 1))]; // without PRIOR
+        }
     }
 }

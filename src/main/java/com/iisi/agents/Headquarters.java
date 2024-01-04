@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,6 +30,7 @@ public class Headquarters extends Agent {
         incidents = allEntities.stream()
                                .filter(x -> x instanceof Incident && x.isActive())
                                .map(x -> (Incident) x)
+                               .sorted(Comparator.comparing(x -> x.getPriority().value)) // add sorting by createdAt
                                .collect(Collectors.toList());
 
         for (Incident incident : incidents) {
