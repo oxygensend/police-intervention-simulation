@@ -27,10 +27,13 @@ public class Headquarters extends Agent {
                              .filter(x -> x instanceof PolicePatrol && x.isActive())
                              .map(x -> (PolicePatrol) x)
                              .collect(Collectors.toList());
+
+        var compareByPriority = Comparator.comparing(Incident::getPriorityValue);
+        var compareByCreatedAt = Comparator.comparing(Incident::getCreatedAt);
         incidents = allEntities.stream()
                                .filter(x -> x instanceof Incident && x.isActive())
                                .map(x -> (Incident) x)
-                               .sorted(Comparator.comparing(x -> x.getPriority().value)) // add sorting by createdAt
+                               .sorted(compareByPriority.thenComparing(compareByCreatedAt))
                                .collect(Collectors.toList());
 
         for (Incident incident : incidents) {
@@ -42,15 +45,20 @@ public class Headquarters extends Agent {
                         availablePatrol.takeTask(incident);
                         incident.setPatrolsReaching(availablePatrol);
                         LOGGER.info("Support patrol {} is going to firing at {}", availablePatrol.id, incident.position);
+
+                        if (availablePatrol.district != incident.district) {
+                            incident.district.statistics.incrementNumberOfPatrolsComingFromOtherDistricts();
+                        }
                     } else if (incident.getPatrolsReaching().isEmpty()) {
                         availablePatrol.takeTask(incident);
                         incident.setPatrolsReaching(availablePatrol);
                         LOGGER.info("Patrol {} is going to incident at {}", availablePatrol.id, incident.position);
+
+                        if (availablePatrol.district != incident.district) {
+                            incident.district.statistics.incrementNumberOfPatrolsComingFromOtherDistricts();
+                        }
                     }
 
-                    if (availablePatrol.district != incident.district) {
-                        incident.district.statistics.incrementNumberOfPatrolsComingFromOtherDistricts();
-                    }
 
                     break;
                 }

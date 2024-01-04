@@ -178,6 +178,9 @@ public class Incident extends Agent implements Stepable {
         return priority;
     }
 
+    public int getPriorityValue() {
+        return priority.value;
+    }
     public void setPriority(Priority priority) {
         this.priority = priority;
     }
