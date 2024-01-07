@@ -126,6 +126,7 @@ public class City {
             LOGGER.info("Number of patrols for district {}: {}", district.name, numberOfPatrols);
             district.setDangerCoefficient(normalizedDanger);
             district.setNumberOfPatrols(numberOfPatrols);
+            district.statistics.reset();
             totalPatrolsAssigned += numberOfPatrols;
 
             map.put(district, normalizedDanger);

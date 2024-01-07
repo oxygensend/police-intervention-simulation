@@ -1,7 +1,7 @@
 package com.iisi.agents;
 
 import com.iisi.City;
-import com.iisi.DistrictStatistics;
+import com.iisi.statistics.DistrictStatistics;
 import com.iisi.utils.Point;
 
 import java.util.*;

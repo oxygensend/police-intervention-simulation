@@ -1,4 +1,4 @@
-package com.iisi;
+package com.iisi.statistics;
 
 public class DistrictStatistics {
     private int numberOfPatrols;
@@ -84,10 +84,10 @@ public class DistrictStatistics {
         // Calculating danger coefficient based on interventions, firings,
         // solved issues, neutralized patrols, and patrols coming from different districts
         return (0.3 * numberOfInterventions +
-                0.4 * numberOfFirings +
-                0.2 * numberOfSolvedInterventions +
+                0.4 * numberOfFirings -
+                0.2 * numberOfSolvedInterventions -
                 0.1 * numberOfSolvedFirings +
                 0.4 * numberOfNeutralizedPatrols +
-                0.2 * numberOfPatrolsComingFromOtherDistricts) / (numberOfPatrols + 1);
+                0.3 * numberOfPatrolsComingFromOtherDistricts) / (numberOfPatrols + 1);
     }
 }
