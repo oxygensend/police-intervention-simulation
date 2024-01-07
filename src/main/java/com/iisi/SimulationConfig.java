@@ -11,21 +11,21 @@ public class SimulationConfig {
     public static final int GRID_HEIGHT = 100;
     public static final int GRID_WIDTH = 100;
 
-    public static final int SIMULATION_DURATION = 10000;
+    public static final int SIMULATION_DURATION = 2000;
     public static final int SHIFT_DURATION = 100;
     public static final int NUMBER_OF_PATROLS = 20;
     public static final int BASE_THREAT_LEVEL = 1;
     public static final int BASE_PATROL_SPEED = 1;
     public static final int INTERVENTION_PATROL_SPEED = 5;
-    public static final int MIN_INTERVENTION_DURATION = 5;
-    public static final int MAX_INTERVENTION_DURATION = 15;
+    public static final int MIN_INTERVENTION_DURATION = 3;
+    public static final int MAX_INTERVENTION_DURATION = 10;
     public static final int MIN_FIRING_STRENGTH = 20;
     public static final int MAX_FIRING_STRENGTH = 90;
 
     public static final Map<District.ThreatLevel, Double> PROBABILITY_OF_INCIDENT_BY_THREAT_LEVEL = Map.of(
             District.ThreatLevel.LOW, 0.01,
             District.ThreatLevel.MEDIUM, 0.02,
-            District.ThreatLevel.HIGH, 0.03
+            District.ThreatLevel.HIGH, 0.04
     );
 
     public static final Map<District.Districts, List<Point>> DISTRICT_BOUNDARIES_CONFIG = Map.of(

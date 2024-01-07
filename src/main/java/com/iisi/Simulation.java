@@ -1,6 +1,8 @@
 package com.iisi;
 
 import com.iisi.agents.*;
+import com.iisi.statistics.HistoricDistrictStatistics;
+import com.iisi.statistics.StatisticsCsvWriter;
 import com.iisi.utils.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +35,9 @@ public class Simulation {
             LOGGER.info("Sleeping for 5 seconds------------------------------------------------------------------");
             Thread.sleep(100);
         }
+
+        LOGGER.info("Simulation is over, saving data to csv files");
+        StatisticsCsvWriter.saveDistrictStatistics();
     }
 
     private void removeInActiveAgents() {
@@ -84,7 +89,10 @@ public class Simulation {
             if (incident instanceof Incident) {
                 ((Incident) incident).step();
                 if (incident.isActive()) {
-                    LOGGER.info("Incident {} at {}", incident.id, incident.getPosition());
+                    var beingSolved = ((Incident) incident).getPatrolsSolving().isEmpty() ? "not being solved" : "solving";
+                    var patrolReached = ((Incident) incident).getPatrolsReaching().isEmpty() ? "not assigned" : "reaching";
+                    var incidentName = ((Incident) incident).isFiring() ? "Firing" : "Intervention";
+                    LOGGER.info("Incident({}) {} at {} is {} patrol {}",  incidentName, incident.id, incident.getPosition(), beingSolved, patrolReached);
                 }
             }
         }
@@ -113,6 +121,7 @@ public class Simulation {
 
             LOGGER.info("District {} created with threatLevel {}", district.name, district.getThreatLevel());
             City.instance().addDistrict(district);
+            City.instance().addHistoricDistrictStatistics(new HistoricDistrictStatistics(district));
 
             for (int i = 0; i < district.initialNumberOfPatrols; i++) {
                 var patrolPosition = district.getRandomPositionInDistrict();

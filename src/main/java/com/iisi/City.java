@@ -4,6 +4,7 @@ import com.iisi.agents.Agent;
 import com.iisi.agents.District;
 import com.iisi.agents.Incident;
 import com.iisi.agents.PolicePatrol;
+import com.iisi.statistics.HistoricDistrictStatistics;
 import com.iisi.utils.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,12 +18,15 @@ public class City {
     public final int[][] grid;
     public final List<Agent> agentList;
     public final List<District> districtList;
+    public List<HistoricDistrictStatistics> historicDistrictStatisticsList;
     private int neutralizedPatrolsTotal = 0;
     private int simulationDuration = 0;
+
 
     private City() {
         agentList = new ArrayList<>();
         districtList = new ArrayList<>();
+        historicDistrictStatisticsList = new ArrayList<>();
         grid = new int[SimulationConfig.GRID_HEIGHT][SimulationConfig.GRID_WIDTH];
     }
 
@@ -100,13 +104,18 @@ public class City {
         return simulationDuration >= SimulationConfig.SIMULATION_DURATION;
     }
 
-    public Map<District, Double> calculateDangerLevelsAndPatrolNumberToDistrict() {
+
+    public void addHistoricDistrictStatistics(HistoricDistrictStatistics historicDistrictStatistics) {
+        historicDistrictStatisticsList.add(historicDistrictStatistics);
+    }
+
+    public Map<District, Integer> calculateDangerLevelsAndPatrolNumberToDistrict() {
         int[] requiredPatrolsForDistrict = new int[districtList.size()];
         Arrays.fill(requiredPatrolsForDistrict, 1);
         double sumOfDangerCoefficients = districtList.stream().mapToDouble(District::calculateDangerCoefficient).sum();
         int totalPatrolsAssigned = 0;
         LOGGER.info("Sum of danger coefficients: {}", sumOfDangerCoefficients);
-        var map = new HashMap<District, Double>();
+        var map = new HashMap<District, Integer>();
 
         for (var district :
                 districtList) {
@@ -115,10 +124,9 @@ public class City {
             LOGGER.info("Normalized danger for district {}: {}", district.name, normalizedDanger);
 
             // Calculate the number of patrols for the district based on the normalized danger
-            int numberOfPatrols = (int) Math.ceil(normalizedDanger * SimulationConfig.NUMBER_OF_PATROLS);
+            int numberOfPatrols = 1;
+            numberOfPatrols += (int) Math.ceil(normalizedDanger * (SimulationConfig.NUMBER_OF_PATROLS - districtList.size()));
 
-            // Ensure each district has at least one patrol
-            numberOfPatrols = Math.max(numberOfPatrols, 1);
 
             // Ensure the total number of patrols doesn't exceed maximum value
             numberOfPatrols = Math.min(numberOfPatrols, SimulationConfig.NUMBER_OF_PATROLS - totalPatrolsAssigned);
@@ -126,12 +134,38 @@ public class City {
             LOGGER.info("Number of patrols for district {}: {}", district.name, numberOfPatrols);
             district.setDangerCoefficient(normalizedDanger);
             district.setNumberOfPatrols(numberOfPatrols);
+            City.instance().addHistoricDistrictStatistics(new HistoricDistrictStatistics(district));
             district.statistics.reset();
+            district.statistics.setNumberOfPatrols(numberOfPatrols);
             totalPatrolsAssigned += numberOfPatrols;
 
-            map.put(district, normalizedDanger);
+            map.put(district, numberOfPatrols);
 
         }
+
+        for (var district : districtList) {
+            if (district.getNumberOfPatrols() == 0) {
+                District districtWithMostPatrols = districtList.stream()
+                                                               .max(Comparator.comparingInt(District::getNumberOfPatrols))
+                                                               .orElse(null);
+
+                if (districtWithMostPatrols != null && districtWithMostPatrols.getNumberOfPatrols() > 1) {
+                    int currentPatrols = districtWithMostPatrols.getNumberOfPatrols();
+                    map.put(districtWithMostPatrols, currentPatrols - 1);
+                    map.put(district, 1);
+                    district.setNumberOfPatrols(1);
+                    districtWithMostPatrols.setNumberOfPatrols(currentPatrols - 1);
+                    City.instance().addHistoricDistrictStatistics(new HistoricDistrictStatistics(district));
+                    City.instance().addHistoricDistrictStatistics(new HistoricDistrictStatistics(districtWithMostPatrols));
+
+                    LOGGER.info("Adjusted patrols: 1 patrol assigned to district {} from district {}",
+                                district.name, districtWithMostPatrols.name);
+                } else {
+                    LOGGER.info("Could not adjust patrols for district {}", district.name);
+                }
+            }
+        }
+
 
         return map;
 

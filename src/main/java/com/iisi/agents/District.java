@@ -38,6 +38,8 @@ public class District {
         this.threatLevel = threatLevel;
         this.initialNumberOfPatrols = initialNumberOfPatrols;
         this.numberOfPatrols = initialNumberOfPatrols;
+
+        this.statistics.setNumberOfPatrols(initialNumberOfPatrols);
     }
 
     @Override
@@ -124,6 +126,10 @@ public class District {
 
     public void setNumberOfPatrols(int numberOfPatrols) {
         this.numberOfPatrols = numberOfPatrols;
+    }
+
+    public DistrictStatistics getStatistics(){
+        return statistics;
     }
 
     public static enum ThreatLevel {

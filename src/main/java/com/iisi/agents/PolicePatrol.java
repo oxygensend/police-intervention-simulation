@@ -24,8 +24,6 @@ public class PolicePatrol extends Agent implements Stepable {
         super(position, district);
         this.position = position;
         this.initialPosition = position;
-
-        district.statistics.incrementNumberOfPatrols();
     }
 
     public enum State {

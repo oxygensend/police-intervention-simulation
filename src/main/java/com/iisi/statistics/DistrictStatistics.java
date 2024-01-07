@@ -42,6 +42,10 @@ public class DistrictStatistics {
         this.numberOfPatrolsComingFromOtherDistricts++;
     }
 
+    public void setNumberOfPatrols(int numberOfPatrols) {
+        this.numberOfPatrols = numberOfPatrols;
+    }
+
     public int getNumberOfPatrols() {
         return numberOfPatrols;
     }
@@ -84,8 +88,8 @@ public class DistrictStatistics {
         // Calculating danger coefficient based on interventions, firings,
         // solved issues, neutralized patrols, and patrols coming from different districts
         return (0.3 * numberOfInterventions +
-                0.4 * numberOfFirings -
-                0.2 * numberOfSolvedInterventions -
+                0.4 * numberOfFirings +
+                0.2 * numberOfSolvedInterventions +
                 0.1 * numberOfSolvedFirings +
                 0.4 * numberOfNeutralizedPatrols +
                 0.3 * numberOfPatrolsComingFromOtherDistricts) / (numberOfPatrols + 1);
