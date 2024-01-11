@@ -76,6 +76,7 @@ public class Incident extends Agent implements Stepable {
                 policePatrol.setState(NEUTRALIZED);
                 policePatrol.step();
                 patrolsSolving.remove(policePatrol);
+                district.statistics.incrementNumberOfNeutralizedPatrols();
             }
         }
 
