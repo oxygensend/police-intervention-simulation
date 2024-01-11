@@ -92,7 +92,7 @@ public class Simulation {
                     var beingSolved = ((Incident) incident).getPatrolsSolving().isEmpty() ? "not being solved" : "solving";
                     var patrolReached = ((Incident) incident).getPatrolsReaching().isEmpty() ? "not assigned" : "reaching";
                     var incidentName = ((Incident) incident).isFiring() ? "Firing" : "Intervention";
-                    LOGGER.info("Incident({}) {} at {} is {} patrol {}",  incidentName, incident.id, incident.getPosition(), beingSolved, patrolReached);
+                    LOGGER.info("Incident({}) {} at {} is {}, patrol {}",  incidentName, incident.id, incident.getPosition(), beingSolved, patrolReached);
                 }
             }
         }

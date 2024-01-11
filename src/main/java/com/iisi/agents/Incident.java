@@ -2,6 +2,7 @@ package com.iisi.agents;
 
 import com.iisi.City;
 import com.iisi.SimulationConfig;
+import com.iisi.agents.PolicePatrol.State;
 import com.iisi.utils.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static com.iisi.agents.PolicePatrol.State.FIRING;
 import static com.iisi.agents.PolicePatrol.State.FIRING_TO_PATROLLING;
+import static com.iisi.agents.PolicePatrol.State.NEUTRALIZED;
 
 public class Incident extends Agent implements Stepable {
 
@@ -54,15 +57,30 @@ public class Incident extends Agent implements Stepable {
                 this.isFiring = random < firingProbability;
                 if (isFiring) {
                     district.statistics.incrementNumberOfFirings();
-                    LOGGER.info("Incident has started firing! {} {}", random, firingProbability);
                     priority = Priority.PRIOR;
+                    patrol.setState(FIRING);
+                    patrol.step();
                 }
             }
         }
 
-        if (isFiring && patrolsSolving.size() != 1) {
-            boolean isEveryPatrolOnFire = patrolsSolving.stream()
-                                                        .allMatch(patrol -> patrol.getState().equals(PolicePatrol.State.FIRING));
+        if (isFiring) {
+            var policePatrol = patrolsSolving.stream().findFirst().orElseThrow();
+
+            int currentSimulationIteration = City.instance().getSimulationDuration();
+            int elapsedTime = currentSimulationIteration - policePatrol.getAssignedTask().getIterationAtStart();
+            double probabilityOfNeutralizedPatrol = calculatePoliceNeutralizedProbability(elapsedTime);
+            double random = new Random().nextDouble();
+            if ( random < probabilityOfNeutralizedPatrol) {
+                LOGGER.info("Police is nautralized at {} {}!", this.position.x(), this.position.y());
+                policePatrol.setState(NEUTRALIZED);
+                policePatrol.step();
+                patrolsSolving.remove(policePatrol);
+            }
+        }
+
+        if (isFiring && patrolsSolving.size() != 1 && patrolsSolving.size() != 0) {
+            boolean isEveryPatrolOnFire = patrolsSolving.stream().allMatch(patrol -> patrol.getState().equals(PolicePatrol.State.FIRING));
 
             if (isEveryPatrolOnFire) {
                 LOGGER.info("Firing {} at {} is solved. Removing...", id, position);
@@ -77,7 +95,7 @@ public class Incident extends Agent implements Stepable {
                 district.statistics.incrementNumberOfSolvedFirings();
             }
 
-        } else {
+        } else if (patrolsSolving.size() != 0) {
             var patrol = patrolsSolving.stream().findFirst().orElseThrow();
             var finishTime = patrol.getAssignedTask().getIterationAtStart() + duration;
             if (City.instance().getSimulationDuration() >= finishTime) {
@@ -92,9 +110,16 @@ public class Incident extends Agent implements Stepable {
         }
     }
 
+    public double calculatePoliceNeutralizedProbability(int elapsedTime) {
+        double maxProbability = 0.95; // Max probability is 5% 
+        double incrementPerIteration = maxProbability / SimulationConfig.MAX_INTERVENTION_DURATION;
+        return Math.min(elapsedTime * incrementPerIteration, maxProbability);
+    }
+
+
     private double calculateFiringProbability(int elapsedTime) {
         double maxProbability = 1.0;
-        double incrementPerIteration = maxProbability / (double) this.duration;
+        double incrementPerIteration = maxProbability / SimulationConfig.MAX_INTERVENTION_DURATION;
         return Math.min(elapsedTime * incrementPerIteration, maxProbability);
     }
 
@@ -143,6 +168,13 @@ public class Incident extends Agent implements Stepable {
             this.patrolsSolving = new ArrayList<>();
         }
         this.patrolsSolving.add(patrol);
+    }
+
+    public void removeSolvingPatrol(PolicePatrol patrol) {
+        if (this.patrolsSolving == null) {
+            this.patrolsSolving = new ArrayList<>();
+        }
+        this.patrolsSolving.remove(patrol);
     }
 
     public void removeReachingPatrol(PolicePatrol patrol) {

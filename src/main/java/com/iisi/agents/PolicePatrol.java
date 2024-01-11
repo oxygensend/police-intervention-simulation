@@ -53,6 +53,7 @@ public class PolicePatrol extends Agent implements Stepable {
                 interventionStep();
                 break;
             case NEUTRALIZED:
+                removeNeutralizedPatrol();
                 break;
             case FIRING_TO_PATROLLING:
                 firingToPatrollingStep();
@@ -78,7 +79,7 @@ public class PolicePatrol extends Agent implements Stepable {
     }
 
     private void headingBackToDistrict() {
-        if (state == State.FIRING_TO_PATROLLING) {
+        if (state == State.FIRING_TO_PATROLLING || state == State.NEUTRALIZED) {
             state = State.PATROLLING;
         }
         var headingBackToDistrictTask = (HeadingBackToDistrictTask) assignedTask;
@@ -100,6 +101,12 @@ public class PolicePatrol extends Agent implements Stepable {
     }
 
     private void firingToPatrollingStep() {
+        var headingPoint = district.findTheNearestPointFromDifferentDistrict(position);
+        assignedTask = new HeadingBackToDistrictTask(headingPoint, City.instance().getSimulationDuration());
+        patrollingStep();
+    }
+
+    private void removeNeutralizedPatrol() {
         var headingPoint = district.findTheNearestPointFromDifferentDistrict(position);
         assignedTask = new HeadingBackToDistrictTask(headingPoint, City.instance().getSimulationDuration());
         patrollingStep();
