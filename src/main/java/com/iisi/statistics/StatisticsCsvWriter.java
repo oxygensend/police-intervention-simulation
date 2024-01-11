@@ -15,6 +15,7 @@ public class StatisticsCsvWriter {
     private static final Logger LOGGER = LoggerFactory.getLogger(StatisticsCsvWriter.class);
     private static final String DIRECTORY_PATH = "statistics";
     private static final String DISTRICT_STATISTICS_FILE = DIRECTORY_PATH + "/district_statistics.csv";
+    private static final String SIMULATION_STATISTICS_FILE = DIRECTORY_PATH + "/simulation_statistics.csv";
     private static final String[] DISTRICT_STATISTICS_HEADERS = new String[]{
             "district",
             "iteration",
@@ -28,10 +29,31 @@ public class StatisticsCsvWriter {
             "numberOfPatrolsComingFromOtherDistricts"
     };
 
+    private static final String[] SIMULATION_STATISTICS_HEADERS = new String[]{
+            "iteration",
+            "numberOfPatrols",
+            "numberOfNeutralizedPatrols",
+            "numberOfPatrolsPatrolling",
+            "numberOfPatrolsTransferringToIncident",
+            "numberOfPatrolsTransferringToFiring",
+            "numberOfPatrolsIntervening",
+            "numberOfPatrolsFiring",
+            "numberOfInterventions",
+            "numberOfSolvedInterventions",
+            "numberOfFirings",
+            "numberOfSolvedFirings",
+
+    };
+
     private StatisticsCsvWriter() {
     }
 
-    public static void saveDistrictStatistics() {
+    public static void save() {
+        saveDistrictStatistics();
+        saveSimulationStatistics();
+    }
+
+    private static void saveDistrictStatistics() {
 
         try {
             Files.createDirectories(Paths.get(DIRECTORY_PATH));
@@ -60,6 +82,42 @@ public class StatisticsCsvWriter {
             writer.close();
 
             LOGGER.info("Data saved to file: {}", DISTRICT_STATISTICS_FILE);
+        } catch (IOException e) {
+            LOGGER.info("Error while saving data to file: {}", e.getMessage());
+        }
+    }
+
+    private static void saveSimulationStatistics() {
+
+        try {
+            Files.createDirectories(Paths.get(DIRECTORY_PATH));
+
+            BufferedWriter writer = new BufferedWriter(new FileWriter(SIMULATION_STATISTICS_FILE));
+
+            writer.write(String.join(",", SIMULATION_STATISTICS_HEADERS));
+            writer.newLine();
+
+            var stat = City.instance().historicSimulationStatisticsList;
+            for (var statistics : City.instance().historicSimulationStatisticsList) {
+                writer.write(String.format("%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
+                                           statistics.iteration(),
+                                           statistics.numberOfPatrols(),
+                                           statistics.numberOfNeutralizedPatrols(),
+                                           statistics.numberOfPatrolsPatrolling(),
+                                           statistics.numberOfPatrolsTransferringToIncident(),
+                                           statistics.numberOfPatrolsTransferringToFiring(),
+                                           statistics.numberOfPatrolsIntervening(),
+                                           statistics.numberOfPatrolsFiring(),
+                                           statistics.numberOfInterventions(),
+                                           statistics.numberOfSolvedInterventions(),
+                                           statistics.numberOfFirings(),
+                                           statistics.numberOfSolvedFirings()));
+                writer.newLine();
+            }
+
+            writer.close();
+
+            LOGGER.info("Data saved to file: {}", SIMULATION_STATISTICS_FILE);
         } catch (IOException e) {
             LOGGER.info("Error while saving data to file: {}", e.getMessage());
         }

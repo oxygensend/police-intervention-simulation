@@ -11,8 +11,8 @@ public class SimulationConfig {
     public static final int GRID_HEIGHT = 100;
     public static final int GRID_WIDTH = 100;
 
-    public static final int SIMULATION_DURATION = 2000;
-    public static final int SHIFT_DURATION = 100;
+    public static final int SIMULATION_DURATION = 20000;
+    public static final int SHIFT_DURATION = 1000;
     public static final int NUMBER_OF_PATROLS = 20;
     public static final int BASE_THREAT_LEVEL = 1;
     public static final int BASE_PATROL_SPEED = 1;
@@ -21,6 +21,7 @@ public class SimulationConfig {
     public static final int MAX_INTERVENTION_DURATION = 10;
     public static final int MIN_FIRING_STRENGTH = 20;
     public static final int MAX_FIRING_STRENGTH = 90;
+    public static final int STATISTICS_INTERVAL = 600;
 
     public static final Map<District.ThreatLevel, Double> PROBABILITY_OF_INCIDENT_BY_THREAT_LEVEL = Map.of(
             District.ThreatLevel.LOW, 0.01,
@@ -54,14 +55,12 @@ public class SimulationConfig {
                     new Point(99, 50)
             )
     );
-
     public static final Map<District.Districts, District.ThreatLevel> DISTRICTS_THREAT_LEVEL_CONFIG = Map.of(
             District.Districts.DISTRICT_1, District.ThreatLevel.LOW,
             District.Districts.DISTRICT_2, District.ThreatLevel.MEDIUM,
             District.Districts.DISTRICT_3, District.ThreatLevel.HIGH,
             District.Districts.DISTRICT_4, District.ThreatLevel.LOW
     );
-
 
     private SimulationConfig() {
     }

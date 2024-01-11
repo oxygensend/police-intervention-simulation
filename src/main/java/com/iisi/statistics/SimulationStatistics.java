@@ -1,66 +1,62 @@
 package com.iisi.statistics;
 
 public class SimulationStatistics {
-    private int numberOfPatrols = 0;
-    private int numberOfInterventions = 0;
-    private int numberOfFirings = 0;
-    private int numberOfNeutralizedPatrols = 0;
-    private int numberOfSolvedInterventions = 0;
-    private int numberOfSolvedFirings = 0;
 
-    public void increaseNumberOfPatrols() {
-        this.numberOfPatrols++;
-    }
+    private static int NUMBER_OF_NEUTRALIZED_PATROLS = 0;
+    private static int NUMBER_OF_INTERVENTIONS = 0;
+    private static int NUMBER_OF_SOLVED_INTERVENTIONS = 0;
+    private static int NUMBER_OF_FIRINGS = 0;
+    private static int NUMBER_OF_SOLVED_FIRINGS = 0;
 
-    public void increaseNumberOfInterventions() {
-        this.numberOfInterventions++;
+    public static void incrementNumberOfNeutralizedPatrols() {
+        NUMBER_OF_NEUTRALIZED_PATROLS++;
     }
 
-    public void increaseNumberOfFirings() {
-        this.numberOfFirings++;
+    public static void incrementNumberOfInterventions() {
+        NUMBER_OF_INTERVENTIONS++;
     }
 
-    public void increaseNumberOfSolvedInterventions() {
-        this.numberOfSolvedInterventions++;
+
+    public static void incrementNumberOfSolvedInterventions() {
+        NUMBER_OF_SOLVED_INTERVENTIONS++;
     }
 
-    public void increaseNumberOfSolvedFirings() {
-        this.numberOfSolvedFirings++;
+    public static void incrementNumberOfFirings() {
+        NUMBER_OF_FIRINGS++;
+        NUMBER_OF_INTERVENTIONS--;
     }
 
-    public void increaseNumberOfNeutralizedPatrols() {
-        this.numberOfNeutralizedPatrols++;
+    public static void incrementNumberOfSolvedFirings() {
+        NUMBER_OF_SOLVED_FIRINGS++;
     }
 
-    public void reset() {
-        this.numberOfPatrols = 0;
-        this.numberOfInterventions = 0;
-        this.numberOfFirings = 0;
-        this.numberOfSolvedInterventions = 0;
-        this.numberOfSolvedFirings = 0;
-        this.numberOfNeutralizedPatrols = 0;
-    }
-    public int getNumberOfPatrols() {
-        return numberOfPatrols;
+    public static int getNumberOfInterventions() {
+        return NUMBER_OF_INTERVENTIONS;
     }
 
-    public int getNumberOfInterventions() {
-        return numberOfInterventions;
+    public static int getNumberOfSolvedInterventions() {
+        return NUMBER_OF_SOLVED_INTERVENTIONS;
     }
 
-    public int getNumberOfFirings() {
-        return numberOfFirings;
+    public static int getNumberOfFirings() {
+        return NUMBER_OF_FIRINGS;
     }
 
-    public int getNumberOfNeutralizedPatrols() {
-        return numberOfNeutralizedPatrols;
+    public static int getNumberOfSolvedFirings() {
+        return NUMBER_OF_SOLVED_FIRINGS;
     }
 
-    public int getNumberOfSolvedInterventions() {
-        return numberOfSolvedInterventions;
+    public static int getNumberOfNeutralizedPatrols() {
+        return NUMBER_OF_NEUTRALIZED_PATROLS;
     }
 
-    public int getNumberOfSolvedFirings() {
-        return numberOfSolvedFirings;
+    public static void reset() {
+        NUMBER_OF_INTERVENTIONS = 0;
+        NUMBER_OF_SOLVED_INTERVENTIONS = 0;
+        NUMBER_OF_FIRINGS = 0;
+        NUMBER_OF_SOLVED_FIRINGS = 0;
+        NUMBER_OF_NEUTRALIZED_PATROLS = 0;
     }
+
+
 }

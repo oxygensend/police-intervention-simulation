@@ -5,11 +5,13 @@ import com.iisi.agents.District;
 import com.iisi.agents.Incident;
 import com.iisi.agents.PolicePatrol;
 import com.iisi.statistics.HistoricDistrictStatistics;
+import com.iisi.statistics.HistoricSimulationStatistics;
 import com.iisi.utils.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class City {
 
@@ -19,6 +21,7 @@ public class City {
     public final List<Agent> agentList;
     public final List<District> districtList;
     public List<HistoricDistrictStatistics> historicDistrictStatisticsList;
+    public List<HistoricSimulationStatistics> historicSimulationStatisticsList;
     private int neutralizedPatrolsTotal = 0;
     private int simulationDuration = 0;
 
@@ -27,6 +30,7 @@ public class City {
         agentList = new ArrayList<>();
         districtList = new ArrayList<>();
         historicDistrictStatisticsList = new ArrayList<>();
+        historicSimulationStatisticsList = new ArrayList<>();
         grid = new int[SimulationConfig.GRID_HEIGHT][SimulationConfig.GRID_WIDTH];
     }
 
@@ -108,6 +112,27 @@ public class City {
     public void addHistoricDistrictStatistics(HistoricDistrictStatistics historicDistrictStatistics) {
         historicDistrictStatisticsList.add(historicDistrictStatistics);
     }
+
+    public void addHistoricSimulationStatistics(HistoricSimulationStatistics historicSimulationStatistics) {
+        historicSimulationStatisticsList.add(historicSimulationStatistics);
+    }
+
+    public int getNumberOfPatrols() {
+        return agentList.stream()
+                        .filter(agent -> agent instanceof PolicePatrol)
+                        .mapToInt(agent -> 1)
+                        .sum();
+    }
+
+    public Map<PolicePatrol.State, Long> getNumberOfPatrolsByState() {
+        return agentList.stream()
+                        .filter(agent -> agent instanceof PolicePatrol)
+                        .collect(Collectors.groupingBy(
+                                agent -> ((PolicePatrol) agent).getState(),
+                                Collectors.counting()
+                        ));
+    }
+
 
     public Map<District, Integer> calculateDangerLevelsAndPatrolNumberToDistrict() {
         int[] requiredPatrolsForDistrict = new int[districtList.size()];

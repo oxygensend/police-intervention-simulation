@@ -18,11 +18,14 @@ public class DistrictStatistics {
     }
 
     public void incrementNumberOfInterventions() {
+        SimulationStatistics.incrementNumberOfInterventions();
         this.numberOfInterventions++;
     }
 
     public void incrementNumberOfFirings() {
+        SimulationStatistics.incrementNumberOfFirings();
         this.numberOfFirings++;
+        this.numberOfInterventions--;
     }
 
     public void incrementNumberOfNeutralizedPatrols() {
@@ -30,11 +33,12 @@ public class DistrictStatistics {
     }
 
     public void incrementNumberOfSolvedInterventions() {
+        SimulationStatistics.incrementNumberOfSolvedInterventions();
         this.numberOfSolvedInterventions++;
     }
 
     public void incrementNumberOfSolvedFirings() {
-        this.numberOfSolvedInterventions++;
+        SimulationStatistics.incrementNumberOfSolvedFirings();
         this.numberOfSolvedFirings++;
     }
 

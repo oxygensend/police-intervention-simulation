@@ -2,11 +2,14 @@ package com.iisi;
 
 import com.iisi.agents.*;
 import com.iisi.statistics.HistoricDistrictStatistics;
+import com.iisi.statistics.HistoricSimulationStatistics;
+import com.iisi.statistics.SimulationStatistics;
 import com.iisi.statistics.StatisticsCsvWriter;
 import com.iisi.utils.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
 import java.util.Random;
 
 
@@ -26,6 +29,11 @@ public class Simulation {
 
             CITY.incrementSimulationDuration();
 
+            if (CITY.getSimulationDuration() != 0 && CITY.getSimulationDuration() % SimulationConfig.STATISTICS_INTERVAL == 0) {
+                saveStatistics();
+                LOGGER.info("Saving statistics!------------------------------------------------------------------");
+            }
+
             if (CITY.getSimulationDuration() != 0 && CITY.getSimulationDuration() % SimulationConfig.SHIFT_DURATION == 0) {
                 LOGGER.info("Shift is over!------------------------------------------------------------------");
                 changeShifts();
@@ -33,11 +41,11 @@ public class Simulation {
             }
 
             LOGGER.info("Sleeping for 5 seconds------------------------------------------------------------------");
-            Thread.sleep(100);
+//            Thread.sleep(10);
         }
 
         LOGGER.info("Simulation is over, saving data to csv files");
-        StatisticsCsvWriter.saveDistrictStatistics();
+        StatisticsCsvWriter.save();
     }
 
     private void removeInActiveAgents() {
@@ -92,7 +100,7 @@ public class Simulation {
                     var beingSolved = ((Incident) incident).getPatrolsSolving().isEmpty() ? "not being solved" : "solving";
                     var patrolReached = ((Incident) incident).getPatrolsReaching().isEmpty() ? "not assigned" : "reaching";
                     var incidentName = ((Incident) incident).isFiring() ? "Firing" : "Intervention";
-                    LOGGER.info("Incident({}) {} at {} is {}, patrol {}",  incidentName, incident.id, incident.getPosition(), beingSolved, patrolReached);
+                    LOGGER.info("Incident({}) {} at {} is {}, patrol {}", incidentName, incident.id, incident.getPosition(), beingSolved, patrolReached);
                 }
             }
         }
@@ -163,6 +171,25 @@ public class Simulation {
         return patrolPerDistrict;
     }
 
+    private void saveStatistics() {
+        var numberOfPatrolsByState = CITY.getNumberOfPatrolsByState();
+        CITY.addHistoricSimulationStatistics(new HistoricSimulationStatistics(
+                CITY.getSimulationDuration(),
+                CITY.getNumberOfPatrols(),
+                SimulationStatistics.getNumberOfNeutralizedPatrols(),
+                Math.toIntExact(numberOfPatrolsByState.getOrDefault(PolicePatrol.State.PATROLLING, 0L)),
+                Math.toIntExact(numberOfPatrolsByState.getOrDefault(PolicePatrol.State.TRANSFER_TO_INTERVENTION, 0L)),
+                Math.toIntExact(numberOfPatrolsByState.getOrDefault(PolicePatrol.State.TRANSFER_TO_FIRING, 0L)),
+                Math.toIntExact(numberOfPatrolsByState.getOrDefault(PolicePatrol.State.INTERVENTION, 0L)),
+                Math.toIntExact(numberOfPatrolsByState.getOrDefault(PolicePatrol.State.FIRING, 0L)),
+                SimulationStatistics.getNumberOfInterventions(),
+                SimulationStatistics.getNumberOfSolvedInterventions(),
+                SimulationStatistics.getNumberOfFirings(),
+                SimulationStatistics.getNumberOfSolvedFirings()
+        ));
+
+        SimulationStatistics.reset();
+    }
 
 //    private static List<District> generateRandomDistricts() {
 //        List<District> districts = new ArrayList<>();
