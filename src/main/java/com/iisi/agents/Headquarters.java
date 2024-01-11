@@ -49,6 +49,7 @@ public class Headquarters extends Agent {
                         if (availablePatrol.district != incident.district) {
                             incident.district.statistics.incrementNumberOfPatrolsComingFromOtherDistricts();
                         }
+                        break;
                     } else if (incident.getPatrolsReaching().isEmpty()) {
                         availablePatrol.takeTask(incident);
                         incident.setPatrolsReaching(availablePatrol);
@@ -57,10 +58,9 @@ public class Headquarters extends Agent {
                         if (availablePatrol.district != incident.district) {
                             incident.district.statistics.incrementNumberOfPatrolsComingFromOtherDistricts();
                         }
+                        break;
                     }
 
-
-                    break;
                 }
             }
         }
