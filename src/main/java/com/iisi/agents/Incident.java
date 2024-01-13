@@ -52,8 +52,8 @@ public class Incident extends Agent implements Stepable {
 
                 int currentSimulationIteration = City.instance().getSimulationDuration();
                 int elapsedTime = currentSimulationIteration - patrol.getAssignedTask().getIterationAtStart();
-                double firingProbability = calculateFiringProbability(elapsedTime);
-                double random = new Random().nextDouble();
+                double firingProbability = calculateFiringProbability(elapsedTime) * 0.001;
+                double random =new Random().nextDouble();
                 this.isFiring = random < firingProbability;
                 if (isFiring) {
                     district.statistics.incrementNumberOfFirings();
@@ -69,7 +69,7 @@ public class Incident extends Agent implements Stepable {
 
             int currentSimulationIteration = City.instance().getSimulationDuration();
             int elapsedTime = currentSimulationIteration - policePatrol.getAssignedTask().getIterationAtStart();
-            double probabilityOfNeutralizedPatrol = calculatePoliceNeutralizedProbability(elapsedTime);
+            double probabilityOfNeutralizedPatrol = calculatePoliceNeutralizedProbability(elapsedTime) * 0.1; // 10%
             double random = new Random().nextDouble();
             if ( random < probabilityOfNeutralizedPatrol) {
                 LOGGER.info("Police is nautralized at {} {}!", this.position.x(), this.position.y());
@@ -86,6 +86,7 @@ public class Incident extends Agent implements Stepable {
             if (isEveryPatrolOnFire) {
                 LOGGER.info("Firing {} at {} is solved. Removing...", id, position);
                 isActive = false;
+                isFiring = false;
                 for (PolicePatrol patrol : patrolsSolving) {
                     patrol.setState(FIRING_TO_PATROLLING);
                     patrol.step();
@@ -102,6 +103,7 @@ public class Incident extends Agent implements Stepable {
             if (City.instance().getSimulationDuration() >= finishTime) {
                 LOGGER.info("Incident {} at {} is solved. Removing...", id, position);
                 isActive = false;
+                isFiring = false;
                 patrol.step();
                 patrolsReaching = null;
                 patrolsSolving = null;
@@ -112,13 +114,14 @@ public class Incident extends Agent implements Stepable {
     }
 
     public double calculatePoliceNeutralizedProbability(int elapsedTime) {
-        double maxProbability = 0.95; // Max probability is 5% 
+        double maxProbability = 1.0; 
         double incrementPerIteration = maxProbability / SimulationConfig.MAX_INTERVENTION_DURATION;
         return Math.min(elapsedTime * incrementPerIteration, maxProbability);
     }
 
 
     private double calculateFiringProbability(int elapsedTime) {
+        LOGGER.info("XXX- {}", elapsedTime);
         double maxProbability = 1.0;
         double incrementPerIteration = maxProbability / SimulationConfig.MAX_INTERVENTION_DURATION;
         return Math.min(elapsedTime * incrementPerIteration, maxProbability);

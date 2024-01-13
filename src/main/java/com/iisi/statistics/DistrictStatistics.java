@@ -29,6 +29,7 @@ public class DistrictStatistics {
     }
 
     public void incrementNumberOfNeutralizedPatrols() {
+        SimulationStatistics.incrementNumberOfNeutralizedPatrols();
         this.numberOfNeutralizedPatrols++;
     }
 
