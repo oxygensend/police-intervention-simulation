@@ -49,9 +49,22 @@ class Plotter:
         plt.ylabel('') 
         plt.show()
 
+    def plot_relationship(self, x, y, title):
+        plt.figure(figsize=(10, 6))
+        sns.scatterplot(data=self.data, x=x, y=y, hue="district")
+        plt.title(title)
+        plt.xlabel(x)
+        plt.ylabel(y)
+        plt.legend(title="District")
+        plt.show()
+
 plotter = Plotter('../statistics/district_statistics.csv')
 plotter.plot_danger_coefficient()
 plotter.plot_number_of_patrols()
 plotter.plot_number_of_interventions()
 plotter.plot_pie_chart('numberOfInterventions')
 plotter.plot_neutralized_patrols();
+
+plotter.plot_relationship('numberOfInterventions', 'dangerCoefficient', 'Number of Interventions vs Danger Coefficient')
+plotter.plot_relationship('numberOfFirings', 'dangerCoefficient', 'Number of Firings vs Danger Coefficient')
+plotter.plot_relationship('numberOfInterventions', 'numberOfFirings', 'Number of Interventions vs Number of Firings')
