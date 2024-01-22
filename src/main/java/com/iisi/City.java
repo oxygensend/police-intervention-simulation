@@ -160,7 +160,7 @@ public class City {
             district.setDangerCoefficient(normalizedDanger);
             district.setNumberOfPatrols(numberOfPatrols);
             City.instance().addHistoricDistrictStatistics(new HistoricDistrictStatistics(district));
-            district.statistics.reset();
+//            district.statistics.reset();
             district.statistics.setNumberOfPatrols(numberOfPatrols);
             totalPatrolsAssigned += numberOfPatrols;
 
