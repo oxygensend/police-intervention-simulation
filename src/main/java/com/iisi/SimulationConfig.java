@@ -30,36 +30,65 @@ public class SimulationConfig {
     );
 
     public static final Map<District.Districts, List<Point>> DISTRICT_BOUNDARIES_CONFIG = Map.of(
-            District.Districts.DISTRICT_1, List.of(
-                    new Point(0, 0),
-                    new Point(0, 49),
-                    new Point(49, 49),
-                    new Point(49, 0)
-            ),
-            District.Districts.DISTRICT_2, List.of(
-                    new Point(0, 50),
-                    new Point(0, 99),
-                    new Point(49, 99),
-                    new Point(49, 50)
-            ),
-            District.Districts.DISTRICT_3, List.of(
-                    new Point(50, 0),
-                    new Point(50, 49),
-                    new Point(99, 49),
-                    new Point(99, 0)
-            ),
-            District.Districts.DISTRICT_4, List.of(
-                    new Point(50, 50),
-                    new Point(50, 99),
-                    new Point(99, 99),
-                    new Point(99, 50)
-            )
+        District.Districts.DISTRICT_1, List.of(
+            new Point(0, 0),
+            new Point(0, 24),
+            new Point(49, 24),
+            new Point(49, 0)
+        ),
+        District.Districts.DISTRICT_2, List.of(
+            new Point(0, 25),
+            new Point(0, 49),
+            new Point(49, 49),
+            new Point(49, 25)
+        ),
+        District.Districts.DISTRICT_3, List.of(
+            new Point(0, 50),
+            new Point(0, 74),
+            new Point(49, 74),
+            new Point(49, 50)
+        ),
+        District.Districts.DISTRICT_4, List.of(
+            new Point(0, 75),
+            new Point(0, 99),
+            new Point(49, 99),
+            new Point(49, 75)
+        ),
+        District.Districts.DISTRICT_5, List.of(
+            new Point(50, 0),
+            new Point(50, 24),
+            new Point(99, 24),
+            new Point(99, 0)
+        ),
+        District.Districts.DISTRICT_6, List.of(
+            new Point(50, 25),
+            new Point(50, 49),
+            new Point(99, 49),
+            new Point(99, 25)
+        ),
+        District.Districts.DISTRICT_7, List.of(
+            new Point(50, 50),
+            new Point(50, 74),
+            new Point(99, 74),
+            new Point(99, 50)
+        ),
+        District.Districts.DISTRICT_8, List.of(
+            new Point(50, 75),
+            new Point(50, 99),
+            new Point(99, 99),
+            new Point(99, 75)
+        )
     );
+    
     public static final Map<District.Districts, District.ThreatLevel> DISTRICTS_THREAT_LEVEL_CONFIG = Map.of(
             District.Districts.DISTRICT_1, District.ThreatLevel.LOW,
             District.Districts.DISTRICT_2, District.ThreatLevel.MEDIUM,
             District.Districts.DISTRICT_3, District.ThreatLevel.HIGH,
-            District.Districts.DISTRICT_4, District.ThreatLevel.LOW
+            District.Districts.DISTRICT_4, District.ThreatLevel.LOW,
+            District.Districts.DISTRICT_5, District.ThreatLevel.LOW,
+            District.Districts.DISTRICT_6, District.ThreatLevel.MEDIUM,
+            District.Districts.DISTRICT_7, District.ThreatLevel.HIGH,
+            District.Districts.DISTRICT_8, District.ThreatLevel.LOW
     );
 
     private SimulationConfig() {

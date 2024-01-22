@@ -100,6 +100,27 @@ public class District {
         this.threatLevel = threatLevel;
     }
 
+    public void setNewThreatLevel() {
+        if(name == Districts.DISTRICT_1) {
+            this.threatLevel = ThreatLevel.MEDIUM;
+        } else if (name == Districts.DISTRICT_2) {
+            this.threatLevel = ThreatLevel.HIGH;
+        } else if (name == Districts.DISTRICT_3) {
+            this.threatLevel = ThreatLevel.LOW;
+        } else if (name == Districts.DISTRICT_4) {
+            this.threatLevel = ThreatLevel.HIGH;
+        } else if (name == Districts.DISTRICT_5) {
+            this.threatLevel = ThreatLevel.MEDIUM;
+        } else if (name == Districts.DISTRICT_6) {
+            this.threatLevel = ThreatLevel.HIGH;
+        } else if (name == Districts.DISTRICT_7) {
+            this.threatLevel = ThreatLevel.MEDIUM;
+        } else if (name == Districts.DISTRICT_8) {
+            this.threatLevel = ThreatLevel.LOW;
+        }
+        
+    }
+
 
     public Point findTheNearestPointFromDifferentDistrict(Point point) {
         return allPointsInDistrict.stream()
@@ -156,7 +177,11 @@ public class District {
         DISTRICT_1,
         DISTRICT_2,
         DISTRICT_3,
-        DISTRICT_4
+        DISTRICT_4,
+        DISTRICT_5,
+        DISTRICT_6,
+        DISTRICT_7,
+        DISTRICT_8,
     }
 
 

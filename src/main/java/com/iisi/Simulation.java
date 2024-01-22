@@ -108,6 +108,9 @@ public class Simulation {
 
     private void generateNewIncidents() {
         for (var district : CITY.districtList) {
+            if(SimulationConfig.SIMULATION_DURATION == 10000) {
+                district.setNewThreatLevel();
+            }
             var probability = SimulationConfig.PROBABILITY_OF_INCIDENT_BY_THREAT_LEVEL.get(district.getThreatLevel());
             if (new Random().nextDouble() < probability) {
                 var priority = Incident.Priority.getRandomPriority();
