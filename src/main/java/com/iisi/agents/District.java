@@ -101,10 +101,10 @@ public class District {
     }
 
     public void setNewThreatLevel() {
-        if(name == Districts.DISTRICT_1) {
+        if (name == Districts.DISTRICT_1) {
             this.threatLevel = ThreatLevel.MEDIUM;
         } else if (name == Districts.DISTRICT_2) {
-            this.threatLevel = ThreatLevel.HIGH;
+            this.threatLevel = ThreatLevel.LOW;
         } else if (name == Districts.DISTRICT_3) {
             this.threatLevel = ThreatLevel.LOW;
         } else if (name == Districts.DISTRICT_4) {
@@ -112,13 +112,55 @@ public class District {
         } else if (name == Districts.DISTRICT_5) {
             this.threatLevel = ThreatLevel.MEDIUM;
         } else if (name == Districts.DISTRICT_6) {
-            this.threatLevel = ThreatLevel.HIGH;
+            this.threatLevel = ThreatLevel.MEDIUM;
         } else if (name == Districts.DISTRICT_7) {
             this.threatLevel = ThreatLevel.MEDIUM;
         } else if (name == Districts.DISTRICT_8) {
             this.threatLevel = ThreatLevel.LOW;
         }
-        
+
+    }
+
+    public void setNewThreatLevel2() {
+        if (name == Districts.DISTRICT_1) {
+            this.threatLevel = ThreatLevel.MEDIUM;
+        } else if (name == Districts.DISTRICT_2) {
+            this.threatLevel = ThreatLevel.LOW;
+        } else if (name == Districts.DISTRICT_3) {
+            this.threatLevel = ThreatLevel.LOW;
+        } else if (name == Districts.DISTRICT_4) {
+            this.threatLevel = ThreatLevel.HIGH;
+        } else if (name == Districts.DISTRICT_5) {
+            this.threatLevel = ThreatLevel.LOW;
+        } else if (name == Districts.DISTRICT_6) {
+            this.threatLevel = ThreatLevel.LOW;
+        } else if (name == Districts.DISTRICT_7) {
+            this.threatLevel = ThreatLevel.MEDIUM;
+        } else if (name == Districts.DISTRICT_8) {
+            this.threatLevel = ThreatLevel.HIGH;
+        }
+
+    }
+
+    public void setNewThreatLevel3() {
+        if (name == Districts.DISTRICT_1) {
+            this.threatLevel = ThreatLevel.LOW;
+        } else if (name == Districts.DISTRICT_2) {
+            this.threatLevel = ThreatLevel.LOW;
+        } else if (name == Districts.DISTRICT_3) {
+            this.threatLevel = ThreatLevel.LOW;
+        } else if (name == Districts.DISTRICT_4) {
+            this.threatLevel = ThreatLevel.HIGH;
+        } else if (name == Districts.DISTRICT_5) {
+            this.threatLevel = ThreatLevel.HIGH;
+        } else if (name == Districts.DISTRICT_6) {
+            this.threatLevel = ThreatLevel.HIGH;
+        } else if (name == Districts.DISTRICT_7) {
+            this.threatLevel = ThreatLevel.LOW;
+        } else if (name == Districts.DISTRICT_8) {
+            this.threatLevel = ThreatLevel.MEDIUM;
+        }
+
     }
 
 
@@ -149,19 +191,23 @@ public class District {
         this.numberOfPatrols = numberOfPatrols;
     }
 
-    public DistrictStatistics getStatistics(){
+    public DistrictStatistics getStatistics() {
         return statistics;
     }
 
     public static enum ThreatLevel {
-        LOW(1),
-        MEDIUM(2),
-        HIGH(3);
+        LOW(1, 0, 0.1),
+        MEDIUM(2, 0.1, 0.2),
+        HIGH(3, 0.2, 1);
 
         public final int level;
+        public final double low;
+        public final double high;
 
-        ThreatLevel(int level) {
+        ThreatLevel(int level, double low, double high) {
             this.level = level;
+            this.low = low;
+            this.high = high;
         }
 
         public static ThreatLevel from(int value) {

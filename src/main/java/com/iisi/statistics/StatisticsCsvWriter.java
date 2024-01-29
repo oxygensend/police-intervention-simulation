@@ -26,7 +26,8 @@ public class StatisticsCsvWriter {
             "numberOfFirings",
             "numberOfSolvedFirings",
             "numberOfNeutralizedPatrols",
-            "numberOfPatrolsComingFromOtherDistricts"
+            "numberOfPatrolsComingFromOtherDistricts",
+            "threatLevel"
     };
 
     private static final String[] SIMULATION_STATISTICS_HEADERS = new String[]{
@@ -65,7 +66,7 @@ public class StatisticsCsvWriter {
 
             var stat = City.instance().historicDistrictStatisticsList;
             for (var statistics : City.instance().historicDistrictStatisticsList) {
-                writer.write(String.format("%s, %d,%.2f,%d,%d,%d,%d,%d,%d,%d",
+                writer.write(String.format("%s, %d,%.2f,%d,%d,%d,%d,%d,%d,%d, %s",
                                            statistics.districtName(),
                                            statistics.iteration(),
                                            statistics.dangerCoefficient(),
@@ -75,7 +76,9 @@ public class StatisticsCsvWriter {
                                            statistics.numberOfFirings(),
                                            statistics.numberOfSolvedFirings(),
                                            statistics.numberOfNeutralizedPatrols(),
-                                           statistics.numberOfPatrolsComingFromOtherDistricts()));
+                                           statistics.numberOfPatrolsComingFromOtherDistricts(),
+                                           statistics.threatLevel().toString())
+                );
                 writer.newLine();
             }
 
@@ -111,7 +114,8 @@ public class StatisticsCsvWriter {
                                            statistics.numberOfInterventions(),
                                            statistics.numberOfSolvedInterventions(),
                                            statistics.numberOfFirings(),
-                                           statistics.numberOfSolvedFirings()));
+                                           statistics.numberOfSolvedFirings()
+                ));
                 writer.newLine();
             }
 

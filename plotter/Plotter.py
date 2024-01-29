@@ -58,6 +58,19 @@ class Plotter:
         plt.legend(title="District")
         plt.show()
 
+    def plot_threat_level(self):
+        # Pivot the data
+        pivot_data = self.data.pivot(index='iteration', columns='district', values='threatLevel')
+
+        # Create the heatmap
+        plt.figure(figsize=(10, 6))
+        sns.heatmap(pivot_data)
+        plt.title("Threat Level Over Iterations by District")
+        plt.xlabel("District")
+        plt.ylabel("Iteration")
+        plt.show()
+
+
 plotter = Plotter('../statistics/district_statistics.csv')
 plotter.plot_danger_coefficient()
 plotter.plot_number_of_patrols()

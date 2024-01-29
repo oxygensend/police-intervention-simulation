@@ -13,7 +13,9 @@ public record HistoricDistrictStatistics(
         int numberOfNeutralizedPatrols,
         int numberOfSolvedInterventions,
         int numberOfSolvedFirings,
-        int numberOfPatrolsComingFromOtherDistricts) {
+        int numberOfPatrolsComingFromOtherDistricts,
+        District.ThreatLevel threatLevel
+) {
 
     public HistoricDistrictStatistics(District district) {
         this(district.name,
@@ -25,6 +27,9 @@ public record HistoricDistrictStatistics(
              district.getStatistics().getNumberOfNeutralizedPatrols(),
              district.getStatistics().getNumberOfSolvedInterventions(),
              district.getStatistics().getNumberOfSolvedFirings(),
-             district.getStatistics().getNumberOfPatrolsComingFromOtherDistricts());
+             district.getStatistics().getNumberOfPatrolsComingFromOtherDistricts(),
+             district.getThreatLevel()
+        );
     }
+
 }

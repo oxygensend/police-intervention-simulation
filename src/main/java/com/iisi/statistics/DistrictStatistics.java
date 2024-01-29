@@ -97,6 +97,6 @@ public class DistrictStatistics {
                 0.2 * numberOfSolvedInterventions +
                 0.1 * numberOfSolvedFirings +
                 0.4 * numberOfNeutralizedPatrols +
-                0.3 * numberOfPatrolsComingFromOtherDistricts) / (numberOfPatrols + 1);
+                0.1 * numberOfPatrolsComingFromOtherDistricts);
     }
 }
